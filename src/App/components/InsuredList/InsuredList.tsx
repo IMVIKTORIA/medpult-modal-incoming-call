@@ -23,32 +23,30 @@ import CustomInputSelect from "../CustomInputSelect/CustomInputSelect";
 
 /** Пропсы Модального окна */
 export type InsuredListProps = {
-  /** Иденификаторы выбранных обратившихся */
-  selectedContractorsIds: string[];
   /** Идентификаторы выбранных застрахованных */
   selectedInsuredIds: string[];
   /** Установить идентификаторы выбранных застрахованных */
   setSelectedInsuredIds: React.Dispatch<React.SetStateAction<string[]>>;
   /** Поисковые данные контрагента */
   contractorsSearchData: ContractorsSearchData;
+  /** Иденификаторы выбранных обратившихся */
+  selectedContractorsIds: string[];
 };
 
 /** Данные поиска дубликатов застрахованного */
 export interface InsuredSearchData extends ContractorsSearchData {
   /** Данные поисковой строки */
   searchQuery?: string;
-  /** Выбранные обратившиеся */
-  contractorsIds?: string[];
   /** Поле, по которому выполняется поиск */
   searchField?: string;
 }
 
 /** Список застрахованных */
 export default function InsuredList({
-  selectedContractorsIds,
   selectedInsuredIds,
   setSelectedInsuredIds,
   contractorsSearchData,
+  selectedContractorsIds,
 }: InsuredListProps) {
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -59,10 +57,11 @@ export default function InsuredList({
   /** Обработчик нажатия на кнопку "Глобальный поиск"  */
   const onClickSearchContractor = async () => {
     // Открыть форму отбора застрахованных
-    window.localStorage.removeItem("medpult-draft");
-    const link = Scripts.getInsuredPagePath();
+    const link = Scripts.getSelectInsuredPagePath();
     const redirectUrl = new URL(window.location.origin + "/" + link);
-    redirectSPA(redirectUrl.toString());
+    if (contractorsSearchData.phone)
+      redirectUrl.searchParams.set("phone", contractorsSearchData.phone);
+    utils.redirectSPA(redirectUrl.toString());
   };
 
   /** Обработчик нажатия на кнопку "Редактировать"  */
@@ -72,10 +71,18 @@ export default function InsuredList({
     openContractorInEditMode(selectedInsuredIds[0]);
   };
 
+  // Вспомогательная функция для показа ошибок
+  const showErrorMessage = (message: string) => {
+    if ((window as any).showError) (window as any).showError(message);
+  };
   /** Обработчик нажатия на кнопку "Создать обращение"  */
   const newRequest = async () => {
+    if (!selectedContractorsIds.length) {
+      showErrorMessage("Выберите обратившегося");
+      return;
+    }
     // Открыть форму создания обращения
-    openNewRequest(selectedInsuredIds[0]);
+    openNewRequest(selectedContractorsIds[0], selectedInsuredIds[0]);
   };
 
   /** Обработчик нажатия на застрахованного */
@@ -134,15 +141,6 @@ export default function InsuredList({
   ];
 
   /** Данные поиска */
-  const getSearchDataWithQuery = (): InsuredSearchData => {
-    return {
-      ...contractorsSearchData,
-      searchQuery: searchQueryDebounced,
-      contractorsIds: selectedContractorsIds,
-      searchField: selectedSearchField,
-    };
-  };
-
   const searchFieldsCode = columns.filter((col) =>
     ["fullname", "policy"].includes(col.code)
   );
@@ -158,13 +156,18 @@ export default function InsuredList({
   )?.name;
 
   const [searchDataWithQuery, setSearchDataWithQuery] =
-    useState<InsuredSearchData>(() => getSearchDataWithQuery());
-
+    useState<InsuredSearchData>({
+      ...contractorsSearchData,
+      searchQuery: searchQueryDebounced,
+      searchField: selectedSearchField,
+    });
   useEffect(() => {
-    setSearchDataWithQuery(getSearchDataWithQuery());
-  }, [searchQueryDebounced, selectedContractorsIds, contractorsSearchData]);
-
-  const isDisabled = selectedInsuredIds.length === 0;
+    setSearchDataWithQuery({
+      ...contractorsSearchData,
+      searchQuery: searchQueryDebounced,
+      searchField: selectedSearchField,
+    });
+  }, [contractorsSearchData, searchQueryDebounced, selectedSearchField]);
 
   const handleGetData = async (
     page: number,
@@ -175,6 +178,9 @@ export default function InsuredList({
 
     return response;
   };
+
+  const isDisabledEdit = selectedInsuredIds.length === 0;
+  const isDisabledAdd = selectedContractorsIds.length === 0;
 
   return (
     <div className="insured-list">
@@ -206,14 +212,18 @@ export default function InsuredList({
             icon={icons.EditButton}
             buttonType="outline"
             style={{
-              opacity: isDisabled ? "0.4" : "1",
-              cursor: isDisabled ? "not-allowed" : "pointer",
+              opacity: isDisabledEdit ? "0.4" : "1",
+              cursor: isDisabledEdit ? "not-allowed" : "pointer",
             }}
           />
           <Button
             title={"Создать обращение"}
             clickHandler={newRequest}
             icon={icons.AddButton}
+            style={{
+              opacity: isDisabledAdd ? "0.4" : "1",
+              cursor: isDisabledAdd ? "not-allowed" : "pointer",
+            }}
           />
         </div>
       </div>

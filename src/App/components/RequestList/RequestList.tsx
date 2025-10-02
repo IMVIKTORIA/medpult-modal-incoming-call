@@ -18,8 +18,6 @@ import icons from "../../shared/icons";
 import CustomInputSelect from "../CustomInputSelect/CustomInputSelect";
 
 export type RequestListProps = {
-  /** Иденификаторы выбранных обратившихся */
-  selectedContractorsIds: string[];
   /** Идентификаторы выбранных застрахованных */
   selectedInsuredIds: string[];
   /** Поисковые данные контрагента */
@@ -32,6 +30,8 @@ export type RequestListProps = {
   sliderActive?: boolean;
   /** Изменить значение показывать закрытые задачи */
   setSliderActive?: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Иденификаторы выбранных обратившихся */
+  selectedContractorsIds: string[];
 };
 
 /** Данные поиска обращений */
@@ -40,8 +40,6 @@ export interface RequestSearchData extends ContractorsSearchData {
   searchQuery?: string;
   /** Идентификаторы выбранных застрахованных */
   insuredIds?: string[];
-  /** Идентификаторы выбранных обратившихся */
-  contractorsIds?: string[];
   /** Показывать закрытые задачи */
   isShowClosed?: boolean;
   /** Поле, по которому выполняется поиск */
@@ -50,13 +48,13 @@ export interface RequestSearchData extends ContractorsSearchData {
 
 /** Список обращений */
 export default function RequestList({
-  selectedContractorsIds,
   selectedInsuredIds,
   contractorsSearchData,
   selectedRequestsIds,
   setSelectedRequestsIds,
   sliderActive,
   setSliderActive,
+  selectedContractorsIds,
 }: RequestListProps) {
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -83,18 +81,26 @@ export default function RequestList({
     window.open(redirectUrl.toString(), "_blank");
   };
 
+  // Вспомогательная функция для показа ошибок
+  const showErrorMessage = (message: string) => {
+    if ((window as any).showError) (window as any).showError(message);
+  };
   /** Обработчик нажатия на кнопку "Создать обращение"  */
   const newRequest = async () => {
+    if (!selectedContractorsIds.length) {
+      showErrorMessage("Выберите обратившегося");
+      return;
+    }
     // Открыть форму создания обращения
-    openNewRequest(selectedInsuredIds[0]);
+    openNewRequest(selectedContractorsIds[0], selectedInsuredIds[0]);
   };
 
   /** Обработчик нажатия на кнопку "Привязать обращение"  */
   const bindRequest = async () => {
-    if (!selectedRequestsIds[0]) return;
+    if (!selectedRequestsIds) return;
     await Scripts.createInteractionByRequestId(
       selectedRequestsIds[0],
-      selectedContractorsIds[0]
+      contractorsSearchData.phone
     );
     utils.setRequest(selectedRequestsIds[0]);
 
@@ -179,7 +185,6 @@ export default function RequestList({
       ...contractorsSearchData,
       searchQuery: searchQueryDebounced,
       insuredIds: selectedInsuredIds,
-      contractorsIds: selectedContractorsIds,
       isShowClosed: sliderActive,
       searchField: selectedSearchField,
     };
@@ -209,10 +214,11 @@ export default function RequestList({
   }, [
     searchQueryDebounced,
     selectedInsuredIds,
-    selectedContractorsIds,
     contractorsSearchData,
     sliderActive,
   ]);
+
+  const isDisabledAdd = selectedContractorsIds.length === 0;
 
   return (
     <div className="request-list">
@@ -256,6 +262,10 @@ export default function RequestList({
             title={"Создать обращение"}
             clickHandler={newRequest}
             icon={icons.AddButton}
+            style={{
+              opacity: isDisabledAdd ? "0.4" : "1",
+              cursor: isDisabledAdd ? "not-allowed" : "pointer",
+            }}
           />
         </div>
       </div>

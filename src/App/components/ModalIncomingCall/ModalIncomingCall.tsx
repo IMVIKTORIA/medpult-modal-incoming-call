@@ -26,9 +26,6 @@ export type ModalIncomingCallProps = {
 export default function ModalIncomingCall({
   contractorsSearchData,
 }: ModalIncomingCallProps) {
-  //Закрыть модальное окно
-  const modalClose = () => Scripts.closeModal();
-
   // Идентификаторы выбранных обратившихся
   const [selectedContractorsIds, setSelectedContractorsIds] = useState<
     string[]
@@ -43,64 +40,62 @@ export default function ModalIncomingCall({
   // Вкладка застрахованные
   const insuredTab = InsuredTab({
     contractorsSearchData: contractorsSearchData,
-    selectedContractorsIds: selectedContractorsIds,
     selectedInsuredIds: selectedInsuredIds,
     setSelectedInsuredIds: setSelectedInsuredIds,
+    selectedContractorsIds: selectedContractorsIds,
   });
 
   // Вкладка обращения
   const requestsTab = RequestsTab({
-    selectedContractorsIds: selectedContractorsIds,
     selectedInsuredIds: selectedInsuredIds,
     contractorsSearchData: contractorsSearchData,
     selectedRequestsIds: selectedRequestsIds,
     setSelectedRequestsIds: setSelectedRequestsIds,
+    selectedContractorsIds: selectedContractorsIds,
   });
 
   // Вкладка задачи
   const tasksTab = TasksTab({
-    selectedContractorsIds: selectedContractorsIds,
     selectedInsuredIds: selectedInsuredIds,
     selectedRequestsIds: selectedRequestsIds,
     contractorsSearchData: contractorsSearchData,
     selectedTasksIds: selectedTasksIds,
     setSelectedTasksIds: setSelectedTasksIds,
+    selectedContractorsIds: selectedContractorsIds,
   });
 
   return (
-    <ModalWrapper>
-      <div className="incoming-call-modal">
-        <div className="incoming-call-modal__header">
-          <span className="incoming-call-modal__header__label">
-            Входящий звонок
-          </span>
+    <div className="incoming-call-modal">
+      <div className="incoming-call-modal__header">
+        <span className="incoming-call-modal__header__label">
+          Входящий звонок
+        </span>
+      </div>
+
+      <div className="incoming-call-modal__content">
+        <div className="incoming-call-modal__search">
+          <SearchContractor phone={contractorsSearchData.phone} />
         </div>
 
-        <div className="incoming-call-modal__content">
-          <div className="incoming-call-modal__search">
-            <SearchContractor phone={contractorsSearchData.phone} />
-          </div>
+        <div className="incoming-call-modal__panel">
+          <ContractorList
+            selectedContractorsIds={selectedContractorsIds}
+            setSelectedContractorsIds={setSelectedContractorsIds}
+            contractorsSearchData={contractorsSearchData}
+          />
+        </div>
 
-          <div className="incoming-call-modal__panel">
-            <ContractorList
-              selectedContractorsIds={selectedContractorsIds}
-              setSelectedContractorsIds={setSelectedContractorsIds}
-              contractorsSearchData={contractorsSearchData}
-            />
-          </div>
-
-          <div className="incoming-call-modal__table">
-            <TabsWrapper>
-              {/* Вкладка застрахованных */}
-              {insuredTab}
-              {/* Вкладка обращений */}
-              {requestsTab}
-              {/* Вкладка задач */}
-              {tasksTab}
-            </TabsWrapper>
-          </div>
+        <div className="incoming-call-modal__table">
+          <TabsWrapper>
+            {/* Вкладка застрахованных */}
+            {insuredTab}
+            {/* Вкладка обращений */}
+            {requestsTab}
+            {/* Вкладка задач */}
+            {tasksTab}
+          </TabsWrapper>
         </div>
       </div>
-    </ModalWrapper>
+    </div>
   );
 }

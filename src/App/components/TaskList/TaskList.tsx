@@ -24,8 +24,6 @@ export interface TaskSearchData extends ContractorsSearchData {
   requestsIds?: string[];
   /** Идентификаторы выбранных застрахованных */
   insuredIds?: string[];
-  /** Идентификаторы выбранных обратившихся */
-  contractorsIds?: string[];
   /** Показывать закрытые задачи */
   isShowClosed?: boolean;
   /** Поле, по которому выполняется поиск */
@@ -33,8 +31,6 @@ export interface TaskSearchData extends ContractorsSearchData {
 }
 
 export type TaskListProps = {
-  /** Иденификаторы выбранных обратившихся */
-  selectedContractorsIds: string[];
   /** Идентификаторы выбранных застрахованных */
   selectedInsuredIds: string[];
   /** Выбранные обращения */
@@ -49,11 +45,12 @@ export type TaskListProps = {
   sliderActive?: boolean;
   /** Изменить значение показывать закрытые задачи */
   setSliderActive?: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Иденификаторы выбранных обратившихся */
+  selectedContractorsIds: string[];
 };
 
 /** Список задач */
 export default function TaskList({
-  selectedContractorsIds,
   selectedInsuredIds,
   selectedRequestsIds,
   contractorsSearchData,
@@ -61,6 +58,7 @@ export default function TaskList({
   setSelectedTasksIds,
   sliderActive,
   setSliderActive,
+  selectedContractorsIds,
 }: TaskListProps) {
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -92,7 +90,7 @@ export default function TaskList({
     if (!selectedTasksIds[0]) return;
     await Scripts.createInteractionByTaskId(
       selectedTasksIds[0],
-      selectedContractorsIds[0]
+      contractorsSearchData.phone
     );
     utils.setRequest(selectedTasksIds[0]);
 
@@ -102,12 +100,20 @@ export default function TaskList({
       redirectUrl.searchParams.set("task_id", selectedTasksIds[0]);
     utils.redirectSPA(redirectUrl.toString());
   };
+
+  // Вспомогательная функция для показа ошибок
+  const showErrorMessage = (message: string) => {
+    if ((window as any).showError) (window as any).showError(message);
+  };
   /** Обработчик нажатия на кнопку "Создать обращение"  */
   const newRequest = async () => {
+    if (!selectedContractorsIds.length) {
+      showErrorMessage("Выберите обратившегося");
+      return;
+    }
     // Открыть форму создания обращения
-    openNewRequest(selectedInsuredIds[0]);
+    openNewRequest(selectedContractorsIds[0], selectedInsuredIds[0]);
   };
-
   /** Колонки списка */
   const columns = [
     new ListColumnData({
@@ -161,7 +167,6 @@ export default function TaskList({
       ...contractorsSearchData,
       searchQuery: searchQueryDebounced,
       requestsIds: selectedRequestsIds,
-      contractorsIds: selectedContractorsIds,
       insuredIds: selectedInsuredIds,
       isShowClosed: sliderActive,
       searchField: selectedSearchField,
@@ -192,12 +197,12 @@ export default function TaskList({
   }, [
     searchQueryDebounced,
     selectedRequestsIds,
-    selectedContractorsIds,
     selectedInsuredIds,
     contractorsSearchData,
     sliderActive,
   ]);
 
+  const isDisabledAdd = selectedContractorsIds.length === 0;
   return (
     <div className="request-list">
       <div className="request-list__search">
@@ -237,9 +242,13 @@ export default function TaskList({
           />
 
           <Button
-            title={"Создать обращение"}
+            title={"Создать задачу"}
             clickHandler={newRequest}
             icon={icons.AddButton}
+            style={{
+              opacity: isDisabledAdd ? "0.4" : "1",
+              cursor: isDisabledAdd ? "not-allowed" : "pointer",
+            }}
           />
         </div>
       </div>

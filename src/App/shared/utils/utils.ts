@@ -168,16 +168,22 @@ export function openContractorInEditMode(contractorId?: string) {
   const redirectUrl = new URL(window.location.origin + "/" + link);
   redirectUrl.searchParams.set("is_edit", "true");
 
-  window.open(redirectUrl.toString(), "_blank");
+  window.open(redirectUrl.toString());
   //redirectSPAWithURL(redirectUrl);
 }
 
 //Отркыть форму создания обращения
-export async function openNewRequest(contractorId?: string) {
+export async function openNewRequest(
+  contractorId?: string,
+  insuredId?: string
+) {
   if (!contractorId) return;
 
   window.localStorage.removeItem("medpult-draft");
-  const requestId = await Scripts.createRequestForContractor(contractorId);
+  const requestId = await Scripts.createRequestForContractor(
+    contractorId,
+    insuredId
+  );
 
   const link = Scripts.getRequestPagePath();
   const redirectUrl = new URL(window.location.origin + "/" + link);

@@ -25,22 +25,6 @@ function randomDelay() {
   });
 }
 
-/** Получение данных обратившегося по звонку */
-async function getContractor(phone: any): Promise<ContractorListData> {
-  return {
-    /** Идентификатор */
-    id: new ItemDataString("1"),
-    fullname: new MyItemData({ value: "Иванов Иван Иванович", info: "1" }),
-    phone: new ItemDataString(formatPhone("79998887766")),
-    birthdate: new ItemDataString("01.01.1991"),
-    policy: new ItemDataString("00SB755380849982/1"),
-    policyStartDate: new ItemDataString("20.01.2025"),
-    policyEndDate: new ItemDataString("20.02.2026"),
-    type: new ItemDataString("Застрахованный"),
-    adress: new ItemDataString("г. Москва, ул. Тверская 121/1"),
-  };
-}
-
 /** Получение списка обратившихся */
 async function getContractorList(
   page: number,
@@ -66,7 +50,7 @@ async function getContractorList(
   await randomDelay();
 
   return {
-    items: Array(10)
+    items: Array(5)
       .fill(0)
       .map((data, index) => {
         return {
@@ -250,48 +234,16 @@ function getContractorPageCode(): string {
 }
 
 /** Получение кода страницы Отбора застрахованных */
-function getInsuredPagePath(): string {
+function getSelectInsuredPagePath(): string {
   return "";
 }
-
-type UpdateSearchDataCallback = (searchData: ContractorsSearchData) => void;
-/** Функция обновления данных поиска контрагента */
-let updateSearchDataCallback: UpdateSearchDataCallback | undefined;
-/** Установка функции обновления данных поиска контрагента */
-function setUpdateSearchDataCallback(callback: UpdateSearchDataCallback) {
-  updateSearchDataCallback = callback;
-  window["updateSearchDataCallback"] = callback; // DEBUG ONLY
+/** Получение кода страницы Отбора контрагентов */
+function getSelectContractorPagePath(): string {
+  return "";
 }
-
-type UpdateShowModalCallback = (isShowModal: boolean) => void;
-/** Функция обновления видимости модального окна */
-let updateShowModalCallback: UpdateShowModalCallback | undefined;
-/** Установка функции обновления видимости модального окна */
-function setUpdateShowModalCallback(callback: UpdateShowModalCallback) {
-  updateShowModalCallback = callback;
-
-  window["updateShowModalCallback"] = updateShowModalCallback; // DEBUG ONLY
-  updateShowModalCallback(true); // DEBUG ONLY
-}
-/** Закрыть модальное окно */
-function closeModal() {
-  // TODO: Логика
-}
-
-/** Запустить стандартную логику сохранения */
-function runCommonSave() {
-  // TODO: Логика
-}
-
-/** Запустить логику сохранения с выбранным контрагентом */
-function runSaveWithInsured(insuredIds: string[]) {
-  // TODO: Логика
-}
-
 /** Получить количество отфильтрованных обращений по выбранному Застрахованному */
 async function getFilteredRequestsCount(
   insuredIds: string[],
-  contractorsIds: string[],
   contractorsSearchData: ContractorsSearchData,
   isShowClosed: boolean
 ) {
@@ -303,7 +255,6 @@ async function getFilteredRequestsCount(
 async function getFilteredTasksCount(
   requestsIds: string[],
   insuredIds: string[],
-  contractorsIds: string[],
   contractorsSearchData: ContractorsSearchData,
   isShowClosed: boolean
 ) {
@@ -312,61 +263,29 @@ async function getFilteredTasksCount(
   return Math.floor(Math.random() * 10);
 }
 
-/** Получить количество отфильтрованных застрахованных по выбранному обратившемуся */
-async function getFilteredInsuredCount(
-  contractorsIds: string[],
-  contractorsSearchData: ContractorsSearchData
-) {
-  await randomDelay();
-  // TODO: Логика
-  return Math.floor(Math.random() * 10);
-}
-
-/** Запись Застрахованного в черновик
- * @param fieldId Идентификатор html элемента, в который запишется значение
- * @param contractorId Идентификатор контрагента
- */
-async function assignInsured(fieldId: string, contractorId: string) {
-  // const draftObj = JSON.parse(localStorage.getItem("medpult-draft"));
-  // const draftItem = {
-  //     fieldId: fieldId,
-  //     contractorId: contractorId
-  // }
-  // if (draftObj == undefined) {
-  //     localStorage.setItem("medpult-draft", JSON.stringify([
-  //         draftItem
-  //     ]));
-  //     return;
-  // }
-  // const itemIndex = draftObj.findIndex((d: any) => d.fieldId === fieldId);
-  // if (itemIndex === -1) {
-  //     draftObj.push(draftItem)
-  // } else {
-  //     draftObj[itemIndex] = draftItem;
-  // }
-  // localStorage.setItem("medpult-draft", JSON.stringify(draftObj));
-}
-
 async function createRequestForContractor(
-  contractorId?: string
+  contractorId?: string,
+  insuredId?: string
 ): Promise<string | undefined> {
   return "0197c997-a1df-71ea-88e2-0c9ec3d1f792";
 }
 
 async function createInteractionByRequestId(
   requestId?: string,
-  contractorId?: string,
-  phone?: string
+  phone?: string,
+  contractorId?: string
 ): Promise<void> {}
 
 async function createInteractionByTaskId(
   requestId?: string,
-  contractorId?: string,
-  phone?: string
+  phone?: string,
+  contractorId?: string
 ): Promise<void> {}
-export default {
-  getContractor,
 
+async function OnInit(): Promise<void> {
+  await randomDelay();
+}
+export default {
   getContractorList,
   getInsuredList,
   getRequestList,
@@ -378,24 +297,18 @@ export default {
   getCountTask,
 
   getRequestPagePath,
-  getInsuredPagePath,
+  getSelectInsuredPagePath,
   getRequestIdByTaskId,
   getContractorPageCode,
-
-  closeModal,
-  runCommonSave,
-  runSaveWithInsured,
+  getSelectContractorPagePath,
 
   getFilteredRequestsCount,
-
-  setUpdateSearchDataCallback,
-  setUpdateShowModalCallback,
-
-  getFilteredInsuredCount,
   getFilteredTasksCount,
-  assignInsured,
+
   createRequestForContractor,
 
   createInteractionByRequestId,
   createInteractionByTaskId,
+
+  OnInit,
 };

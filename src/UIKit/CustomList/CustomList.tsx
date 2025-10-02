@@ -167,7 +167,6 @@ function CustomList<SearchDataType = any, ItemType = any>(
   const handleSortClick = (sortDataNew: SortData | undefined) => {
     setSortData(sortDataNew);
   };
-
   /** Получение ширины скроллбара */
   const getScrollbarWidth = (ref: React.RefObject<HTMLDivElement>) => {
     const element = ref.current;

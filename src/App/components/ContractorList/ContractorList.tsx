@@ -118,6 +118,7 @@ export default function ContractorList({
     new ListColumnData({
       name: "Вид контрагента",
       code: "type",
+      isSortable: true,
       fr: 1,
     }),
     new ListColumnData({
@@ -126,15 +127,6 @@ export default function ContractorList({
       fr: 1,
     }),
   ];
-
-  /** Данные поиска */
-  const getSearchDataWithQuery = (): ContractorsSearchDataExtended => {
-    return {
-      ...contractorsSearchData,
-      searchQuery: searchQueryDebounced,
-      searchField: selectedSearchField,
-    };
-  };
 
   const searchFieldsCode = columns.filter((col) =>
     ["fullname", "policy", "adress"].includes(col.code)
@@ -151,11 +143,18 @@ export default function ContractorList({
   )?.name;
 
   const [searchDataWithQuery, setSearchDataWithQuery] =
-    useState<ContractorsSearchDataExtended>(() => getSearchDataWithQuery());
-
+    useState<ContractorsSearchDataExtended>({
+      ...contractorsSearchData,
+      searchQuery: searchQueryDebounced,
+      searchField: selectedSearchField,
+    });
   useEffect(() => {
-    setSearchDataWithQuery(getSearchDataWithQuery());
-  }, [searchQueryDebounced, contractorsSearchData]);
+    setSearchDataWithQuery({
+      ...contractorsSearchData,
+      searchQuery: searchQueryDebounced,
+      searchField: selectedSearchField,
+    });
+  }, [contractorsSearchData, searchQueryDebounced, selectedSearchField]);
 
   const isDisabled = selectedContractorsIds.length === 0;
   return (

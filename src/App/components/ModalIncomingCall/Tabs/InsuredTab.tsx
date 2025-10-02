@@ -7,43 +7,25 @@ import InsuredList, {
 
 /** Список застрахованных */
 export default function InsuredTab(props: InsuredListProps) {
-  const { selectedContractorsIds, selectedInsuredIds, contractorsSearchData } =
-    props;
+  const {
+    contractorsSearchData,
+    selectedInsuredIds,
+    setSelectedInsuredIds,
+    selectedContractorsIds,
+  } = props;
 
   // Общее количество застрахованных
   const [insuredCount, setInsuredCount] = useState<number>(0);
 
-  // Количество отфильтрованных застрахованных
-  const [filteredInsuredCount, setFilteredInsuredCount] = useState<number>(0);
+  const fetchInsuredCount = async () => {
+    const count = await Scripts.getCountInsured(contractorsSearchData);
+    setInsuredCount(count);
+  };
 
-  // Обновление количества отфильтрованных по застрахованным застрахованных
-  async function updateFilteredInsuredCount(totalCount: number) {
-    // Для дедубликации застрахованных не расчитывать
-    // Если обратившийся не выбран, то обращения не фильтруются
-    if (!selectedContractorsIds.length)
-      return setFilteredInsuredCount(totalCount);
-
-    // При выбранном обратившемся получить количество застрахованных по этому обратившемуся с указанными фильтрами
-    const count = await Scripts.getFilteredInsuredCount(
-      selectedContractorsIds,
-      contractorsSearchData
-    );
-    setFilteredInsuredCount(count);
-  }
-
-  // Обновить количества
-  async function updateCounts() {
-    const totalCount = await Scripts.getCountInsured(contractorsSearchData);
-    await updateFilteredInsuredCount(totalCount);
-
-    setInsuredCount(totalCount);
-  }
-
-  // При изменении выбранного застрахованного, фильтров или общего количества застрахованных
   useEffect(() => {
     setIsLoading(true);
-    updateCounts().then(() => setIsLoading(false));
-  }, [selectedContractorsIds, contractorsSearchData]);
+    fetchInsuredCount().then(() => setIsLoading(false));
+  }, [contractorsSearchData]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   function getCountString(count: number) {
@@ -51,17 +33,18 @@ export default function InsuredTab(props: InsuredListProps) {
   }
 
   const countTitle = (
-    <span className="count">
-      {getCountString(
-        selectedContractorsIds?.length ? filteredInsuredCount : insuredCount
-      )}
-    </span>
+    <span className="count">{getCountString(insuredCount)}</span>
   );
 
-  // Вкладка обращения
+  // Вкладка застрахованные
   return (
     <TabItem code={"insuredContragen"} name={<>Застрахованные {countTitle}</>}>
-      <InsuredList {...props} />
+      <InsuredList
+        selectedInsuredIds={selectedInsuredIds}
+        setSelectedInsuredIds={setSelectedInsuredIds}
+        contractorsSearchData={contractorsSearchData}
+        selectedContractorsIds={selectedContractorsIds}
+      />
     </TabItem>
   );
 }

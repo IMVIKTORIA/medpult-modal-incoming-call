@@ -7,7 +7,7 @@ import Scripts from "../../../shared/utils/clientScripts.ts";
 
 /** Список обращений */
 export default function RequestsTab(props: RequestListProps) {
-  const { selectedInsuredIds, selectedContractorsIds, contractorsSearchData } =
+  const { selectedInsuredIds, contractorsSearchData, selectedContractorsIds } =
     props;
 
   //Состояние слайдера
@@ -27,7 +27,6 @@ export default function RequestsTab(props: RequestListProps) {
     // При выбранном застрахованном получить количество обращений по этому застрахованному с указанными фильтрами
     const count = await Scripts.getFilteredRequestsCount(
       selectedInsuredIds,
-      selectedContractorsIds,
       contractorsSearchData,
       sliderActive
     );
@@ -44,12 +43,7 @@ export default function RequestsTab(props: RequestListProps) {
   useEffect(() => {
     setIsLoading(true);
     updateCounts().then(() => setIsLoading(false));
-  }, [
-    selectedInsuredIds,
-    selectedContractorsIds,
-    contractorsSearchData,
-    sliderActive,
-  ]);
+  }, [selectedInsuredIds, contractorsSearchData, sliderActive]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   function getCountString(count: number) {

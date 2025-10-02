@@ -8,15 +8,19 @@ type SearchContractorProps = {
   phone: any;
 };
 export default function SearchContractor({ phone }: SearchContractorProps) {
-  const [contractor, setContractor] = useState<ContractorListData | null>(null);
+  const [contractors, setContractors] = useState<ContractorListData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchContractor() {
-      const data = await Scripts.getContractor(phone);
-      setContractor(data);
+    async function fetchContractors() {
+      setLoading(true);
+      const result = await Scripts.getContractorList(1, undefined, { phone });
+      const items = result.items.map((i) => i.data);
+      setContractors(items);
+      setLoading(false);
     }
-    fetchContractor();
-  }, []);
+    fetchContractors();
+  }, [phone]);
 
   /** Обработчик нажатия на контрагента*/
   const onClickContractor = async (contractor: ContractorListData) => {
@@ -27,13 +31,13 @@ export default function SearchContractor({ phone }: SearchContractorProps) {
   };
   // Перейти на форму отбора контрагентов
   const searchContractor = () => {
-    localStorage.setItem("medpult-call-phone", phone);
-    redirectSPA(
-      "<%=Context.data.select_contractors_path%>?field_id=medpult-worktable-call&&phone=" +
-        encodeURI(phone)
-    );
+    const link = Scripts.getSelectContractorPagePath();
+    const redirectUrl = new URL(window.location.origin + "/" + link);
+    if (phone) redirectUrl.searchParams.set("phone", phone);
+    utils.redirectSPA(redirectUrl.toString());
   };
 
+  const contractor = contractors.length === 1 ? contractors[0] : undefined;
   return (
     <div className="search-contractor">
       <span className="search-contractor__title">Обратившийся</span>
@@ -48,13 +52,13 @@ export default function SearchContractor({ phone }: SearchContractorProps) {
                 <span
                   className="search-contractor__field__value search-contractor__field__value__link"
                   title={contractor?.fullname?.value}
-                  onClick={() => searchContractor()}
+                  onClick={() => onClickContractor(contractor)}
                 >
                   {contractor?.fullname?.value}
                 </span>
                 <span
                   className="search-contractor__field__button"
-                  onClick={() => onClickContractor(contractor)}
+                  onClick={() => searchContractor()}
                 >
                   {icons.Change} <span>Заменить</span>
                 </span>

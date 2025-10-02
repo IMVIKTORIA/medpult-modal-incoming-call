@@ -11,9 +11,9 @@ interface TasksTab extends TaskListProps {
 export default function TasksTab(props: TaskListProps) {
   const {
     selectedRequestsIds,
-    selectedContractorsIds,
     selectedInsuredIds,
     contractorsSearchData,
+    selectedContractorsIds,
   } = props;
 
   //Состояние слайдера
@@ -34,7 +34,6 @@ export default function TasksTab(props: TaskListProps) {
     const count = await Scripts.getFilteredTasksCount(
       selectedRequestsIds,
       selectedInsuredIds,
-      selectedContractorsIds,
       contractorsSearchData,
       sliderActive
     );
@@ -54,7 +53,6 @@ export default function TasksTab(props: TaskListProps) {
   }, [
     selectedRequestsIds,
     contractorsSearchData,
-    selectedContractorsIds,
     selectedInsuredIds,
     sliderActive,
   ]);

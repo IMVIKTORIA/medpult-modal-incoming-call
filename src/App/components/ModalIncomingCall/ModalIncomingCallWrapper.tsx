@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from "react";
-import Scripts from "../../shared/utils/clientScripts.ts";
+import Scripts from "../../shared/utils/clientScripts";
 import { ContractorsSearchData } from "../../shared/types.ts";
 import ModalIncomingCall from "./ModalIncomingCall.tsx";
+import Loader from "../../../UIKit/Loader/Loader";
 
 /** Обёртка модального окна с контроллером видимости */
 export default function ModalIncomingCallWrapper() {
-  // Состояние видимости модального окна
-  const [isShowModal, setIsShowModal] = useState<boolean>();
   // Данные поиска контрагентов с одинаковым номером телефона
   const [contractorsSearchData, setContractorsSearchData] =
     useState<ContractorsSearchData>({});
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    // Установить функцию обновления видимости модального окна извне
-    Scripts.setUpdateShowModalCallback((isShowModal: boolean) =>
-      setIsShowModal(isShowModal)
-    );
-    // Установить функцию обновления данных поиска контрагента вне виджета
-    Scripts.setUpdateSearchDataCallback((searchData: ContractorsSearchData) =>
-      setContractorsSearchData(searchData)
-    );
+    Scripts.OnInit().then(() => {
+      const currentURL = new URL(window.location.href);
+      const phone = currentURL.searchParams.get("phone") || undefined;
+
+      if (phone) {
+        setContractorsSearchData({ phone });
+      }
+      setIsLoading(false);
+    });
   }, []);
 
-  return (
-    <>
-      {isShowModal && (
-        <ModalIncomingCall contractorsSearchData={contractorsSearchData} />
-      )}
-    </>
+  return isLoading ? (
+    <Loader />
+  ) : (
+    <ModalIncomingCall contractorsSearchData={contractorsSearchData} />
   );
 }
