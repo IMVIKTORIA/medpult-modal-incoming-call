@@ -59,6 +59,8 @@ export default function RequestList({
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
 
@@ -83,7 +85,8 @@ export default function RequestList({
 
   // Вспомогательная функция для показа ошибок
   const showErrorMessage = (message: string) => {
-    if ((window as any).showError) (window as any).showError(message);
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 3000);
   };
   /** Обработчик нажатия на кнопку "Создать обращение"  */
   const newRequest = async () => {
@@ -91,15 +94,26 @@ export default function RequestList({
       showErrorMessage("Выберите обратившегося");
       return;
     }
-    // Открыть форму создания обращения
-    openNewRequest(selectedContractorsIds[0], selectedInsuredIds[0]);
+    if (contractorsSearchData.phone)
+      // Открыть форму создания обращения
+      openNewRequest(
+        contractorsSearchData.phone,
+        selectedContractorsIds[0],
+        selectedInsuredIds[0]
+      );
   };
 
   /** Обработчик нажатия на кнопку "Привязать обращение"  */
   const bindRequest = async () => {
-    if (!selectedRequestsIds) return;
+    if (
+      !selectedRequestsIds ||
+      !selectedContractorsIds ||
+      !contractorsSearchData.phone
+    )
+      return;
     await Scripts.createInteractionByRequestId(
       selectedRequestsIds[0],
+      selectedContractorsIds[0],
       contractorsSearchData.phone
     );
     utils.setRequest(selectedRequestsIds[0]);
@@ -221,68 +235,72 @@ export default function RequestList({
   const isDisabledAdd = selectedContractorsIds.length === 0;
 
   return (
-    <div className="request-list">
-      <div className="request-list__search">
-        <div className="request-list__search__button">
-          {/* Поле поиска */}
-          <CustomInputSelect
-            value={searchQuery}
-            setValue={setSearchQuery}
-            cursor="text"
-            placeholder="Поиск"
-            buttons={icons.Search}
-            searchFields={searchOptions.map((o) => o.name)}
-            selectedField={selectedFieldName}
-            setSelectedField={(name) => {
-              const col = searchOptions.find((o) => o.name === name);
-              if (col) setSelectedSearchField(col.code);
-            }}
-          />
-          <SliderPanel
-            title="Закрытые обращения"
-            isVisible={sliderActive ?? false}
-            setIsVisible={(isActive) => {
-              if (setSliderActive) setSliderActive(isActive);
-            }}
-          />
-        </div>
-        <div className="request-list__button">
-          <Button
-            title={"Привязать к обращению"}
-            clickHandler={bindRequest}
-            icon={icons.AddLink}
-            style={{
-              backgroundColor: "#21A038",
-              opacity: isDisabled ? "0.4" : "1",
-              cursor: isDisabled ? "not-allowed" : "pointer",
-            }}
-          />
+    <>
+      <div className="request-list">
+        <div className="request-list__search">
+          <div className="request-list__search__button">
+            {/* Поле поиска */}
+            <CustomInputSelect
+              value={searchQuery}
+              setValue={setSearchQuery}
+              cursor="text"
+              placeholder="Поиск"
+              buttons={icons.Search}
+              searchFields={searchOptions.map((o) => o.name)}
+              selectedField={selectedFieldName}
+              setSelectedField={(name) => {
+                const col = searchOptions.find((o) => o.name === name);
+                if (col) setSelectedSearchField(col.code);
+              }}
+            />
+            <SliderPanel
+              title="Закрытые обращения"
+              isVisible={sliderActive ?? false}
+              setIsVisible={(isActive) => {
+                if (setSliderActive) setSliderActive(isActive);
+              }}
+            />
+          </div>
+          <div className="request-list__button">
+            <Button
+              title={"Привязать к обращению"}
+              clickHandler={bindRequest}
+              icon={icons.AddLink}
+              style={{
+                backgroundColor: "#21A038",
+                opacity: isDisabled ? "0.4" : "1",
+                cursor: isDisabled ? "not-allowed" : "pointer",
+              }}
+            />
 
-          <Button
-            title={"Создать обращение"}
-            clickHandler={newRequest}
-            icon={icons.AddButton}
-            style={{
-              opacity: isDisabledAdd ? "0.4" : "1",
-              cursor: isDisabledAdd ? "not-allowed" : "pointer",
-            }}
+            <Button
+              title={"Создать обращение"}
+              clickHandler={newRequest}
+              icon={icons.AddButton}
+              style={{
+                opacity: isDisabledAdd ? "0.4" : "1",
+                cursor: isDisabledAdd ? "not-allowed" : "pointer",
+              }}
+            />
+          </div>
+        </div>
+        <div className="request-list__list">
+          <CustomList<RequestSearchData, RequestListData>
+            columnsSettings={columns}
+            getDataHandler={Scripts.getRequestList}
+            getDetailsLayout={getDetailsLayout}
+            isScrollable={true}
+            searchFields={selectedSearchField ? [selectedSearchField] : []}
+            searchData={searchDataWithQuery}
+            isSelectable={true}
+            isMultipleSelect={false}
+            setSelectedItems={(ids: string[]) => setSelectedRequestsIds(ids)}
+            selectedItems={selectedRequestsIds}
           />
         </div>
       </div>
-      <div className="request-list__list">
-        <CustomList<RequestSearchData, RequestListData>
-          columnsSettings={columns}
-          getDataHandler={Scripts.getRequestList}
-          getDetailsLayout={getDetailsLayout}
-          isScrollable={true}
-          searchFields={selectedSearchField ? [selectedSearchField] : []}
-          searchData={searchDataWithQuery}
-          isSelectable={true}
-          isMultipleSelect={false}
-          setSelectedItems={(ids: string[]) => setSelectedRequestsIds(ids)}
-          selectedItems={selectedRequestsIds}
-        />
-      </div>
-    </div>
+      {/* Всплывашка */}
+      {errorMessage && <div className="alert-error">{errorMessage}</div>}
+    </>
   );
 }

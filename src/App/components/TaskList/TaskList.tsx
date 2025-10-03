@@ -87,9 +87,15 @@ export default function TaskList({
 
   /** Обработчик нажатия на кнопку "Привязать к задаче"  */
   const bindTask = async () => {
-    if (!selectedTasksIds[0]) return;
+    if (
+      !selectedTasksIds ||
+      !selectedContractorsIds ||
+      !contractorsSearchData.phone
+    )
+      return;
     await Scripts.createInteractionByTaskId(
       selectedTasksIds[0],
+      selectedContractorsIds[0],
       contractorsSearchData.phone
     );
     utils.setRequest(selectedTasksIds[0]);

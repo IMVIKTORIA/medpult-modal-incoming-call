@@ -174,6 +174,7 @@ export function openContractorInEditMode(contractorId?: string) {
 
 //Отркыть форму создания обращения
 export async function openNewRequest(
+  phone: string,
   contractorId?: string,
   insuredId?: string
 ) {
@@ -181,6 +182,7 @@ export async function openNewRequest(
 
   window.localStorage.removeItem("medpult-draft");
   const requestId = await Scripts.createRequestForContractor(
+    phone,
     contractorId,
     insuredId
   );

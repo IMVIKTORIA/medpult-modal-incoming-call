@@ -264,6 +264,7 @@ async function getFilteredTasksCount(
 }
 
 async function createRequestForContractor(
+  phone: string,
   contractorId?: string,
   insuredId?: string
 ): Promise<string | undefined> {
@@ -271,15 +272,15 @@ async function createRequestForContractor(
 }
 
 async function createInteractionByRequestId(
-  requestId?: string,
-  phone?: string,
-  contractorId?: string
+  requestId: string,
+  contractorId: string,
+  phone: string
 ): Promise<void> {}
 
 async function createInteractionByTaskId(
-  requestId?: string,
-  phone?: string,
-  contractorId?: string
+  taskId: string,
+  contractorId: string,
+  phone: string
 ): Promise<void> {}
 
 async function OnInit(): Promise<void> {

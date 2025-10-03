@@ -51,6 +51,8 @@ export default function InsuredList({
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
 
@@ -73,16 +75,24 @@ export default function InsuredList({
 
   // Вспомогательная функция для показа ошибок
   const showErrorMessage = (message: string) => {
-    if ((window as any).showError) (window as any).showError(message);
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 3000);
   };
+
   /** Обработчик нажатия на кнопку "Создать обращение"  */
   const newRequest = async () => {
     if (!selectedContractorsIds.length) {
       showErrorMessage("Выберите обратившегося");
       return;
     }
-    // Открыть форму создания обращения
-    openNewRequest(selectedContractorsIds[0], selectedInsuredIds[0]);
+
+    if (contractorsSearchData.phone)
+      // Открыть форму создания обращения
+      openNewRequest(
+        contractorsSearchData.phone,
+        selectedContractorsIds[0],
+        selectedInsuredIds[0]
+      );
   };
 
   /** Обработчик нажатия на застрахованного */
@@ -183,63 +193,68 @@ export default function InsuredList({
   const isDisabledAdd = selectedContractorsIds.length === 0;
 
   return (
-    <div className="insured-list">
-      <div className="insured-list__search">
-        <div className="insured-list__search__button">
-          {/* Поле поиска */}
-          <CustomInputSelect
-            value={searchQuery}
-            setValue={setSearchQuery}
-            cursor="text"
-            placeholder="Поиск"
-            buttons={icons.Search}
-            searchFields={searchOptions.map((o) => o.name)}
-            selectedField={selectedFieldName}
-            setSelectedField={(name) => {
-              const col = searchOptions.find((o) => o.name === name);
-              if (col) setSelectedSearchField(col.code);
-            }}
-          />
-          <Button
-            title={"Глобальный поиск"}
-            clickHandler={onClickSearchContractor}
-          />
+    <>
+      <div className="insured-list">
+        <div className="insured-list__search">
+          <div className="insured-list__search__button">
+            {/* Поле поиска */}
+            <CustomInputSelect
+              value={searchQuery}
+              setValue={setSearchQuery}
+              cursor="text"
+              placeholder="Поиск"
+              buttons={icons.Search}
+              searchFields={searchOptions.map((o) => o.name)}
+              selectedField={selectedFieldName}
+              setSelectedField={(name) => {
+                const col = searchOptions.find((o) => o.name === name);
+                if (col) setSelectedSearchField(col.code);
+              }}
+            />
+            <Button
+              title={"Глобальный поиск"}
+              clickHandler={onClickSearchContractor}
+            />
+          </div>
+          <div className="insured-list__button">
+            <Button
+              title={"Редактировать"}
+              clickHandler={() => onClickEdit()}
+              icon={icons.EditButton}
+              buttonType="outline"
+              style={{
+                opacity: isDisabledEdit ? "0.4" : "1",
+                cursor: isDisabledEdit ? "not-allowed" : "pointer",
+              }}
+            />
+            <Button
+              title={"Создать обращение"}
+              clickHandler={newRequest}
+              icon={icons.AddButton}
+              style={{
+                opacity: isDisabledAdd ? "0.4" : "1",
+                cursor: isDisabledAdd ? "not-allowed" : "pointer",
+              }}
+            />
+          </div>
         </div>
-        <div className="insured-list__button">
-          <Button
-            title={"Редактировать"}
-            clickHandler={() => onClickEdit()}
-            icon={icons.EditButton}
-            buttonType="outline"
-            style={{
-              opacity: isDisabledEdit ? "0.4" : "1",
-              cursor: isDisabledEdit ? "not-allowed" : "pointer",
-            }}
-          />
-          <Button
-            title={"Создать обращение"}
-            clickHandler={newRequest}
-            icon={icons.AddButton}
-            style={{
-              opacity: isDisabledAdd ? "0.4" : "1",
-              cursor: isDisabledAdd ? "not-allowed" : "pointer",
-            }}
+        <div className="insured-list__list">
+          <CustomList<InsuredSearchData, InsuredListData>
+            columnsSettings={columns}
+            searchData={searchDataWithQuery}
+            searchFields={selectedSearchField ? [selectedSearchField] : []}
+            getDataHandler={handleGetData}
+            isScrollable={true}
+            isSelectable={true}
+            isMultipleSelect={false}
+            setSelectedItems={(ids: string[]) => setSelectedInsuredIds(ids)}
+            selectedItems={selectedInsuredIds}
           />
         </div>
       </div>
-      <div className="insured-list__list">
-        <CustomList<InsuredSearchData, InsuredListData>
-          columnsSettings={columns}
-          searchData={searchDataWithQuery}
-          searchFields={selectedSearchField ? [selectedSearchField] : []}
-          getDataHandler={handleGetData}
-          isScrollable={true}
-          isSelectable={true}
-          isMultipleSelect={false}
-          setSelectedItems={(ids: string[]) => setSelectedInsuredIds(ids)}
-          selectedItems={selectedInsuredIds}
-        />
-      </div>
-    </div>
+
+      {/* Всплывашка */}
+      {errorMessage && <div className="alert-error">{errorMessage}</div>}
+    </>
   );
 }
