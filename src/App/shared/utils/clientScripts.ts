@@ -206,12 +206,18 @@ async function getCountInsured(searchData: ContractorsSearchData) {
   return 10;
 }
 /** Получить количество обращений*/
-async function getCountRequest(searchData: ContractorsSearchData) {
+async function getCountRequest(
+  contractorsIds: string[],
+  searchData: ContractorsSearchData
+) {
   await randomDelay();
   return 4;
 }
 /** Получить количество задач*/
-async function getCountTask(searchData: ContractorsSearchData) {
+async function getCountTask(
+  contractorsIds: string[],
+  searchData: ContractorsSearchData
+) {
   await randomDelay();
   return 10;
 }
@@ -241,8 +247,19 @@ function getSelectInsuredPagePath(): string {
 function getSelectContractorPagePath(): string {
   return "";
 }
+
+/** Получить количество отфильтрованных застрахованных по выбранному обратившемуся */
+async function getFilteredInsuredCount(
+  contractorsIds: string[],
+  contractorsSearchData: ContractorsSearchData
+) {
+  await randomDelay();
+  // TODO: Логика
+  return Math.floor(Math.random() * 10);
+}
 /** Получить количество отфильтрованных обращений по выбранному Застрахованному */
 async function getFilteredRequestsCount(
+  contractorsIds: string[],
   insuredIds: string[],
   contractorsSearchData: ContractorsSearchData,
   isShowClosed: boolean
@@ -253,6 +270,7 @@ async function getFilteredRequestsCount(
 }
 /** Получить количество отфильтрованных задач по выбранному обращению */
 async function getFilteredTasksCount(
+  contractorsIds: string[],
   requestsIds: string[],
   insuredIds: string[],
   contractorsSearchData: ContractorsSearchData,
@@ -266,11 +284,19 @@ async function getFilteredTasksCount(
 async function createRequestForContractor(
   phone: string,
   contractorId?: string,
-  insuredId?: string
+  insuredId?: string,
+  policyId?: string
 ): Promise<string | undefined> {
   return "0197c997-a1df-71ea-88e2-0c9ec3d1f792";
 }
 
+async function createTaskForContractor(
+  phone: string,
+  contractorId?: string,
+  requestsId?: string
+): Promise<string | undefined> {
+  return "0197c997-a1df-71ea-88e2-0c9ec3d1f792";
+}
 async function createInteractionByRequestId(
   requestId: string,
   contractorId: string,
@@ -303,10 +329,12 @@ export default {
   getContractorPageCode,
   getSelectContractorPagePath,
 
+  getFilteredInsuredCount,
   getFilteredRequestsCount,
   getFilteredTasksCount,
 
   createRequestForContractor,
+  createTaskForContractor,
 
   createInteractionByRequestId,
   createInteractionByTaskId,

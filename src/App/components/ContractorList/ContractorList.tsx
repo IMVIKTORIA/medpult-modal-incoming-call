@@ -44,6 +44,8 @@ export default function ContractorList({
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   //Количество обратившихся
   const [contractorCount, setContractorCount] = useState<number>(0);
   const fetchElementsCount = async () => {
@@ -58,9 +60,17 @@ export default function ContractorList({
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
 
+  // Вспомогательная функция для показа ошибок
+  const showErrorMessage = (message: string) => {
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(null), 2000);
+  };
   /** Обработчик нажатия на кнопку "Редактировать"  */
   const onClickEdit = async () => {
-    if (!selectedContractorsIds.length) return;
+    if (!selectedContractorsIds.length) {
+      showErrorMessage("Выберите контрагента");
+      return;
+    }
     // Открыть контрагента
     openContractorInEditMode(selectedContractorsIds[0]);
   };
@@ -158,52 +168,59 @@ export default function ContractorList({
 
   const isDisabled = selectedContractorsIds.length === 0;
   return (
-    <Panel
-      label={"Совпадения по номеру"}
-      count={contractorCount}
-      isOpen={false}
-    >
-      <div className="insured-list">
-        <div className="insured-list__search">
-          {/* Поле поиска */}
-          <CustomInputSelect
-            value={searchQuery}
-            setValue={setSearchQuery}
-            cursor="text"
-            placeholder="Поиск"
-            buttons={icons.Search}
-            searchFields={searchOptions.map((o) => o.name)}
-            selectedField={selectedFieldName}
-            setSelectedField={(name) => {
-              const col = searchOptions.find((o) => o.name === name);
-              if (col) setSelectedSearchField(col.code);
-            }}
-          />
-          <Button
-            title={"Редактировать"}
-            clickHandler={() => onClickEdit()}
-            icon={icons.EditButton}
-            buttonType="outline"
-            style={{
-              opacity: isDisabled ? "0.4" : "1",
-              cursor: isDisabled ? "not-allowed" : "pointer",
-            }}
-          />
+    <>
+      <Panel
+        label={"Совпадения по номеру"}
+        count={contractorCount}
+        isOpen={false}
+      >
+        <div className="insured-list">
+          <div className="insured-list__search">
+            {/* Поле поиска */}
+            <CustomInputSelect
+              value={searchQuery}
+              setValue={setSearchQuery}
+              cursor="text"
+              placeholder="Поиск"
+              buttons={icons.Search}
+              searchFields={searchOptions.map((o) => o.name)}
+              selectedField={selectedFieldName}
+              setSelectedField={(name) => {
+                const col = searchOptions.find((o) => o.name === name);
+                if (col) setSelectedSearchField(col.code);
+              }}
+            />
+            <Button
+              title={"Редактировать"}
+              clickHandler={() => onClickEdit()}
+              icon={icons.EditButton}
+              buttonType="outline"
+              style={{
+                opacity: isDisabled ? "0.4" : "1",
+                cursor: isDisabled ? "not-allowed" : "pointer",
+              }}
+            />
+          </div>
+          <div className="insured-list__list">
+            <CustomList<ContractorsSearchDataExtended, ContractorListData>
+              columnsSettings={columns}
+              getDataHandler={Scripts.getContractorList}
+              searchData={searchDataWithQuery}
+              searchFields={selectedSearchField ? [selectedSearchField] : []}
+              isSelectable={true}
+              isMultipleSelect={false}
+              setSelectedItems={(ids: string[]) =>
+                setSelectedContractorsIds(ids)
+              }
+              selectedItems={selectedContractorsIds}
+              isScrollable={true}
+            />
+          </div>
         </div>
-        <div className="insured-list__list">
-          <CustomList<ContractorsSearchDataExtended, ContractorListData>
-            columnsSettings={columns}
-            getDataHandler={Scripts.getContractorList}
-            searchData={searchDataWithQuery}
-            searchFields={selectedSearchField ? [selectedSearchField] : []}
-            isSelectable={true}
-            isMultipleSelect={false}
-            setSelectedItems={(ids: string[]) => setSelectedContractorsIds(ids)}
-            selectedItems={selectedContractorsIds}
-            isScrollable={true}
-          />
-        </div>
-      </div>
-    </Panel>
+      </Panel>
+
+      {/* Всплывашка */}
+      {errorMessage && <div className="alert-error">{errorMessage}</div>}
+    </>
   );
 }

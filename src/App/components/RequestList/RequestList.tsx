@@ -38,6 +38,8 @@ export type RequestListProps = {
 export interface RequestSearchData extends ContractorsSearchData {
   /** Поисковый запрос */
   searchQuery?: string;
+  /** Идентификаторы выбранных обратившихся */
+  contractorsIds?: string[];
   /** Идентификаторы выбранных застрахованных */
   insuredIds?: string[];
   /** Показывать закрытые задачи */
@@ -86,7 +88,7 @@ export default function RequestList({
   // Вспомогательная функция для показа ошибок
   const showErrorMessage = (message: string) => {
     setErrorMessage(message);
-    setTimeout(() => setErrorMessage(null), 3000);
+    setTimeout(() => setErrorMessage(null), 2000);
   };
   /** Обработчик нажатия на кнопку "Создать обращение"  */
   const newRequest = async () => {
@@ -94,27 +96,41 @@ export default function RequestList({
       showErrorMessage("Выберите обратившегося");
       return;
     }
+
+    const selected = selectedInsuredIds[0] ?? "";
+    let insuredId = "";
+    let policyId = "";
+
+    if (selected.includes("_")) {
+      const [contractorPart, policyPart] = selected.split("_");
+      insuredId = contractorPart;
+      policyId = policyPart;
+    } else {
+      insuredId = selected;
+    }
+
     if (contractorsSearchData.phone)
       // Открыть форму создания обращения
       openNewRequest(
         contractorsSearchData.phone,
         selectedContractorsIds[0],
-        selectedInsuredIds[0]
+        insuredId,
+        policyId
       );
   };
 
   /** Обработчик нажатия на кнопку "Привязать обращение"  */
   const bindRequest = async () => {
-    if (
-      !selectedRequestsIds ||
-      !selectedContractorsIds ||
-      !contractorsSearchData.phone
-    )
+    if (!selectedRequestsIds?.length || !selectedContractorsIds?.length) {
+      showErrorMessage("Выберите обратившегося и обращение");
       return;
+    }
+    const phone = contractorsSearchData.phone || "";
+
     await Scripts.createInteractionByRequestId(
       selectedRequestsIds[0],
       selectedContractorsIds[0],
-      contractorsSearchData.phone
+      phone
     );
     utils.setRequest(selectedRequestsIds[0]);
 
@@ -122,7 +138,8 @@ export default function RequestList({
     const redirectUrl = new URL(window.location.origin + "/" + link);
     if (selectedRequestsIds[0])
       redirectUrl.searchParams.set("request_id", selectedRequestsIds[0]);
-    utils.redirectSPA(redirectUrl.toString());
+    //utils.redirectSPA(redirectUrl.toString());
+    window.open(redirectUrl.toString(), "_blank");
   };
   //Детальная информация обращений
   const getDetailsLayout = ({
@@ -199,13 +216,14 @@ export default function RequestList({
       ...contractorsSearchData,
       searchQuery: searchQueryDebounced,
       insuredIds: selectedInsuredIds,
+      contractorsIds: selectedContractorsIds,
       isShowClosed: sliderActive,
       searchField: selectedSearchField,
     };
   };
 
   const searchFieldsCode = columns.filter((col) =>
-    ["number", "reason"].includes(col.code)
+    ["number", "topic", "reason"].includes(col.code)
   );
   const searchOptions = searchFieldsCode.map((col) => ({
     code: col.code,
@@ -228,6 +246,7 @@ export default function RequestList({
   }, [
     searchQueryDebounced,
     selectedInsuredIds,
+    selectedContractorsIds,
     contractorsSearchData,
     sliderActive,
   ]);

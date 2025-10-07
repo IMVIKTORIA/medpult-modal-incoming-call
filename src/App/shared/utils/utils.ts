@@ -176,7 +176,8 @@ export function openContractorInEditMode(contractorId?: string) {
 export async function openNewRequest(
   phone: string,
   contractorId?: string,
-  insuredId?: string
+  insuredId?: string,
+  policyId?: string
 ) {
   if (!contractorId) return;
 
@@ -184,13 +185,35 @@ export async function openNewRequest(
   const requestId = await Scripts.createRequestForContractor(
     phone,
     contractorId,
-    insuredId
+    insuredId,
+    policyId
   );
 
   const link = Scripts.getRequestPagePath();
   const redirectUrl = new URL(window.location.origin + "/" + link);
   if (requestId) redirectUrl.searchParams.set("request_id", requestId);
-  redirectSPA(redirectUrl.toString());
+  window.open(redirectUrl.toString(), "_blank");
+}
+
+//Отркыть форму создания задачи
+export async function openNewTask(
+  phone: string,
+  contractorId?: string,
+  requestsId?: string
+) {
+  if (!contractorId || !requestsId) return;
+
+  window.localStorage.removeItem("medpult-draft");
+  const requestId = await Scripts.createTaskForContractor(
+    phone,
+    contractorId,
+    requestsId
+  );
+
+  const link = Scripts.getRequestPagePath();
+  const redirectUrl = new URL(window.location.origin + "/" + link);
+  if (requestId) redirectUrl.searchParams.set("request_id", requestId);
+  window.open(redirectUrl.toString(), "_blank");
 }
 
 export default {

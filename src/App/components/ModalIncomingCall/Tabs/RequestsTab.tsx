@@ -16,7 +16,14 @@ export default function RequestsTab(props: RequestListProps) {
   const [requestCount, setRequestCount] = useState<number>(0);
   // Обновить общее количество обращений
   async function updateRequestCount() {
-    const count = await Scripts.getCountRequest(contractorsSearchData);
+    if (!selectedContractorsIds?.length) {
+      setRequestCount(0);
+      return;
+    }
+    const count = await Scripts.getCountRequest(
+      selectedContractorsIds,
+      contractorsSearchData
+    );
     setRequestCount(count);
   }
 
@@ -24,8 +31,13 @@ export default function RequestsTab(props: RequestListProps) {
   const [filteredRequestsCount, setFilteredRequestsCount] = useState<number>(0);
   // Обновление количества отфильтрованных по застрахованным обращений
   async function updateFilteredRequestsCount() {
+    if (!selectedInsuredIds?.length) {
+      setFilteredRequestsCount(0);
+      return;
+    }
     // При выбранном застрахованном получить количество обращений по этому застрахованному с указанными фильтрами
     const count = await Scripts.getFilteredRequestsCount(
+      selectedContractorsIds,
       selectedInsuredIds,
       contractorsSearchData,
       sliderActive
@@ -43,7 +55,12 @@ export default function RequestsTab(props: RequestListProps) {
   useEffect(() => {
     setIsLoading(true);
     updateCounts().then(() => setIsLoading(false));
-  }, [selectedInsuredIds, contractorsSearchData, sliderActive]);
+  }, [
+    selectedInsuredIds,
+    selectedContractorsIds,
+    contractorsSearchData,
+    sliderActive,
+  ]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   function getCountString(count: number) {

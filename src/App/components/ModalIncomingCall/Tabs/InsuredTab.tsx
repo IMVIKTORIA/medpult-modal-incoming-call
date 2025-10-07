@@ -17,15 +17,36 @@ export default function InsuredTab(props: InsuredListProps) {
   // Общее количество застрахованных
   const [insuredCount, setInsuredCount] = useState<number>(0);
 
-  const fetchInsuredCount = async () => {
-    const count = await Scripts.getCountInsured(contractorsSearchData);
-    setInsuredCount(count);
-  };
+  // Количество отфильтрованных застрахованных
+  const [filteredInsuredCount, setFilteredInsuredCount] = useState<number>(0);
 
+  // Обновление количества отфильтрованных по застрахованным застрахованных
+  async function updateFilteredInsuredCount(totalCount: number) {
+    // Если обратившийся не выбран, то обращения не фильтруются
+    if (!selectedContractorsIds.length)
+      return setFilteredInsuredCount(totalCount);
+    // При выбранном обратившемся получить количество застрахованных по этому обратившемуся с указанными фильтрами
+    const count = await Scripts.getFilteredInsuredCount(
+      selectedContractorsIds,
+      contractorsSearchData
+    );
+    setFilteredInsuredCount(count);
+  }
+
+  // Обновить количества
+  async function updateCounts() {
+    //const totalCount = await Scripts.getCountInsured(contractorsSearchData);
+    const totalCount = 0;
+    await updateFilteredInsuredCount(totalCount);
+
+    setInsuredCount(totalCount);
+  }
+
+  // При изменении выбранного застрахованного, фильтров или общего количества застрахованных
   useEffect(() => {
     setIsLoading(true);
-    fetchInsuredCount().then(() => setIsLoading(false));
-  }, [contractorsSearchData]);
+    updateCounts().then(() => setIsLoading(false));
+  }, [selectedContractorsIds, contractorsSearchData]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   function getCountString(count: number) {
@@ -33,7 +54,7 @@ export default function InsuredTab(props: InsuredListProps) {
   }
 
   const countTitle = (
-    <span className="count">{getCountString(insuredCount)}</span>
+    <span className="count">{getCountString(filteredInsuredCount)}</span>
   );
 
   // Вкладка застрахованные

@@ -39,6 +39,8 @@ export interface InsuredSearchData extends ContractorsSearchData {
   searchQuery?: string;
   /** Поле, по которому выполняется поиск */
   searchField?: string;
+  /** Выбранные обратившиеся */
+  contractorsIds?: string[];
 }
 
 /** Список застрахованных */
@@ -68,15 +70,22 @@ export default function InsuredList({
 
   /** Обработчик нажатия на кнопку "Редактировать"  */
   const onClickEdit = async () => {
-    if (!selectedInsuredIds.length) return;
-    // Открыть контрагента в режиме изменения
-    openContractorInEditMode(selectedInsuredIds[0]);
+    if (!selectedInsuredIds.length) {
+      showErrorMessage("Выберите контрагента");
+      return;
+    }
+    const selected = selectedInsuredIds[0];
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selected.includes("_")
+      ? selected.split("_")[0]
+      : selected;
+    openContractorInEditMode(contractorId);
   };
 
   // Вспомогательная функция для показа ошибок
   const showErrorMessage = (message: string) => {
     setErrorMessage(message);
-    setTimeout(() => setErrorMessage(null), 3000);
+    setTimeout(() => setErrorMessage(null), 2000);
   };
 
   /** Обработчик нажатия на кнопку "Создать обращение"  */
@@ -86,12 +95,25 @@ export default function InsuredList({
       return;
     }
 
+    const selected = selectedInsuredIds[0] ?? "";
+    let insuredId = "";
+    let policyId = "";
+
+    if (selected.includes("_")) {
+      const [contractorPart, policyPart] = selected.split("_");
+      insuredId = contractorPart;
+      policyId = policyPart;
+    } else {
+      insuredId = selected;
+    }
+
     if (contractorsSearchData.phone)
       // Открыть форму создания обращения
       openNewRequest(
         contractorsSearchData.phone,
         selectedContractorsIds[0],
-        selectedInsuredIds[0]
+        insuredId,
+        policyId
       );
   };
 
@@ -170,20 +192,34 @@ export default function InsuredList({
       ...contractorsSearchData,
       searchQuery: searchQueryDebounced,
       searchField: selectedSearchField,
+      contractorsIds: selectedContractorsIds,
     });
   useEffect(() => {
     setSearchDataWithQuery({
       ...contractorsSearchData,
       searchQuery: searchQueryDebounced,
       searchField: selectedSearchField,
+      contractorsIds: selectedContractorsIds,
     });
-  }, [contractorsSearchData, searchQueryDebounced, selectedSearchField]);
+  }, [
+    contractorsSearchData,
+    searchQueryDebounced,
+    selectedSearchField,
+    selectedContractorsIds,
+  ]);
 
   const handleGetData = async (
     page: number,
     sortData?: SortData,
     searchData?: InsuredSearchData
   ): Promise<FetchData<InsuredListData>> => {
+    // Если контрагенты не выбраны — вернуть пустой список
+    if (!selectedContractorsIds.length) {
+      return {
+        items: [],
+        hasMore: false,
+      };
+    }
     const response = await Scripts.getInsuredList(page, sortData, searchData);
 
     return response;
