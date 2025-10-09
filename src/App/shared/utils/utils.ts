@@ -199,21 +199,26 @@ export async function openNewRequest(
 export async function openNewTask(
   phone: string,
   contractorId?: string,
-  requestsId?: string
-) {
-  if (!contractorId || !requestsId) return;
+  requestId?: string
+): Promise<boolean> {
+  if (!contractorId || !requestId) return false;
 
   window.localStorage.removeItem("medpult-draft");
-  const requestId = await Scripts.createTaskForContractor(
+
+  const taskCreated = await Scripts.createTaskForContractor(
     phone,
     contractorId,
-    requestsId
+    requestId
   );
+  if (!taskCreated) return false;
 
   const link = Scripts.getRequestPagePath();
   const redirectUrl = new URL(window.location.origin + "/" + link);
   if (requestId) redirectUrl.searchParams.set("request_id", requestId);
+  redirectUrl.searchParams.set("create-task", "new");
   window.open(redirectUrl.toString(), "_blank");
+
+  return true;
 }
 
 export default {

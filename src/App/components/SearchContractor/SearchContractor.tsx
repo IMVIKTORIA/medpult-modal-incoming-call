@@ -1,26 +1,33 @@
 import React, { useEffect, useState } from "react";
 import Scripts from "../../shared/utils/clientScripts";
-import { ContractorListData } from "../../shared/types";
+import { ContractorListData, ContractorsSearchData } from "../../shared/types";
 import icons from "../../shared/icons";
 import utils, { redirectSPA, openContractor } from "../../shared/utils/utils";
 
 type SearchContractorProps = {
-  phone: any;
+  contractorsSearchData: ContractorsSearchData;
 };
-export default function SearchContractor({ phone }: SearchContractorProps) {
+export default function SearchContractor({
+  contractorsSearchData,
+}: SearchContractorProps) {
   const [contractors, setContractors] = useState<ContractorListData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchContractors() {
       setLoading(true);
-      const result = await Scripts.getContractorList(1, undefined, { phone });
+      const result = await Scripts.getContractorList(
+        0,
+        undefined,
+        contractorsSearchData
+      );
       const items = result.items.map((i) => i.data);
+
       setContractors(items);
       setLoading(false);
     }
     fetchContractors();
-  }, [phone]);
+  }, [contractorsSearchData]);
 
   /** Обработчик нажатия на контрагента*/
   const onClickContractor = async (contractor: ContractorListData) => {
@@ -33,7 +40,10 @@ export default function SearchContractor({ phone }: SearchContractorProps) {
   const searchContractor = () => {
     const link = Scripts.getSelectContractorPagePath();
     const redirectUrl = new URL(window.location.origin + "/" + link);
-    if (phone) redirectUrl.searchParams.set("phone", phone);
+    if (contractorsSearchData.phone)
+      redirectUrl.searchParams.set("phone", contractorsSearchData.phone);
+    if (contractorsSearchData.phone)
+      localStorage.setItem("medpult-call-phone", contractorsSearchData.phone);
     utils.redirectSPA(redirectUrl.toString());
   };
 
@@ -161,8 +171,11 @@ export default function SearchContractor({ phone }: SearchContractorProps) {
 
             <div className="search-contractor__field">
               <span className="search-contractor__field__label">Телефон</span>
-              <span className="search-contractor__field__value" title={phone}>
-                {phone}
+              <span
+                className="search-contractor__field__value"
+                title={contractorsSearchData.phone}
+              >
+                {contractorsSearchData.phone}
               </span>
             </div>
           </>

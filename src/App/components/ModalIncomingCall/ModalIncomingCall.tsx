@@ -74,7 +74,7 @@ export default function ModalIncomingCall({
 
       <div className="incoming-call-modal__content">
         <div className="incoming-call-modal__search">
-          <SearchContractor phone={contractorsSearchData.phone} />
+          <SearchContractor contractorsSearchData={contractorsSearchData} />
         </div>
 
         <div className="incoming-call-modal__panel">

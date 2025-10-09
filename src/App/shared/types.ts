@@ -23,7 +23,7 @@ export class ContractorListData {
   /** Дата начала действия полиса */
   policyStartDate?: ItemDataString;
   /** Дата окончания действия полиса */
-  policyEndDate?: ItemDataString;
+  policyEndDate?: DataWithValidation;
   /** Вид контрагента */
   type?: ItemDataString;
   /** Адресс */
@@ -71,7 +71,7 @@ export class InsuredListData {
   /** Дата начала действия полиса */
   policyStartDate?: ItemDataString;
   /** Дата окончания действия полиса */
-  policyEndDate?: ItemDataString;
+  policyEndDate?: DataWithValidation;
   constructor({
     id,
     isIntegration,
@@ -181,4 +181,14 @@ export interface ContractorsSearchDataExtended extends ContractorsSearchData {
   searchQuery?: string;
   /** Идентификаторы выбранных контрагентов */
   contractorsIds?: string[];
+}
+
+/** Данные со значением валидации */
+export interface DataWithValidation {
+  /** Значение */
+  value: string;
+  /** Значение валидно? */
+  isValid: boolean;
+  /** Идентификатор - если есть */
+  id?: string;
 }

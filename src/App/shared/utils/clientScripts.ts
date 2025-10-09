@@ -43,14 +43,14 @@ async function getContractorList(
     birthdate: new ItemDataString("01.01.1991"),
     policy: new ItemDataString("00SB755380849982/1"),
     policyStartDate: new ItemDataString("20.01.2025"),
-    policyEndDate: new ItemDataString("20.02.2026"),
+    policyEndDate: { value: "20.01.2026", isValid: Math.random() < 0.5 },
     type: new ItemDataString("Застрахованный"),
     adress: new ItemDataString("г. Москва, ул. Тверская 121/1"),
   };
   await randomDelay();
 
   return {
-    items: Array(5)
+    items: Array(1)
       .fill(0)
       .map((data, index) => {
         return {
@@ -81,7 +81,7 @@ async function getInsuredList(
 
     policy: new ItemDataString("00SB755380849982/1"),
     policyStartDate: new ItemDataString("20.01.2025"),
-    policyEndDate: new ItemDataString("20.02.2026"),
+    policyEndDate: { value: "20.01.2026", isValid: Math.random() < 0.5 },
   };
 
   return {
@@ -294,20 +294,24 @@ async function createTaskForContractor(
   phone: string,
   contractorId?: string,
   requestsId?: string
-): Promise<string | undefined> {
-  return "0197c997-a1df-71ea-88e2-0c9ec3d1f792";
+): Promise<boolean | undefined> {
+  return false;
 }
 async function createInteractionByRequestId(
   requestId: string,
   contractorId: string,
   phone: string
-): Promise<void> {}
+): Promise<boolean | undefined> {
+  return;
+}
 
 async function createInteractionByTaskId(
   taskId: string,
   contractorId: string,
   phone: string
-): Promise<void> {}
+): Promise<boolean | undefined> {
+  return;
+}
 
 async function OnInit(): Promise<void> {
   await randomDelay();

@@ -20,6 +20,7 @@ import utils, {
 import Button from "../../../UIKit/Button/Button";
 import icons from "../../shared/icons";
 import CustomInputSelect from "../CustomInputSelect/CustomInputSelect";
+import ColumnWithValidation from "../ColumnWithValidation/ColumnWithValidation";
 
 /** Пропсы Модального окна */
 export type InsuredListProps = {
@@ -95,6 +96,12 @@ export default function InsuredList({
       return;
     }
 
+    const selectedContractors = selectedContractorsIds[0] ?? "";
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selectedContractors.includes("_")
+      ? selectedContractors.split("_")[0]
+      : selectedContractors;
+
     const selected = selectedInsuredIds[0] ?? "";
     let insuredId = "";
     let policyId = "";
@@ -111,7 +118,7 @@ export default function InsuredList({
       // Открыть форму создания обращения
       openNewRequest(
         contractorsSearchData.phone,
-        selectedContractorsIds[0],
+        contractorId,
         insuredId,
         policyId
       );
@@ -169,6 +176,7 @@ export default function InsuredList({
       name: "Окончание действия",
       code: "policyEndDate",
       fr: 1,
+      getCustomColumComponent: ColumnWithValidation,
     }),
   ];
 

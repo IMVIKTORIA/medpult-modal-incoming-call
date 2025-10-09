@@ -62,6 +62,7 @@ export default function RequestList({
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [bindSuccess, setBindSuccess] = useState<boolean | null>(false);
 
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -97,10 +98,15 @@ export default function RequestList({
       return;
     }
 
+    const selectedContractors = selectedContractorsIds[0] ?? "";
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selectedContractors.includes("_")
+      ? selectedContractors.split("_")[0]
+      : selectedContractors;
+
     const selected = selectedInsuredIds[0] ?? "";
     let insuredId = "";
     let policyId = "";
-
     if (selected.includes("_")) {
       const [contractorPart, policyPart] = selected.split("_");
       insuredId = contractorPart;
@@ -113,7 +119,7 @@ export default function RequestList({
       // Открыть форму создания обращения
       openNewRequest(
         contractorsSearchData.phone,
-        selectedContractorsIds[0],
+        contractorId,
         insuredId,
         policyId
       );
@@ -122,16 +128,27 @@ export default function RequestList({
   /** Обработчик нажатия на кнопку "Привязать обращение"  */
   const bindRequest = async () => {
     if (!selectedRequestsIds?.length || !selectedContractorsIds?.length) {
-      showErrorMessage("Выберите обратившегося и обращение");
+      showErrorMessage("Выберите обратившегося и обращение в активном статусе");
       return;
     }
     const phone = contractorsSearchData.phone || "";
 
-    await Scripts.createInteractionByRequestId(
+    const selectedContractors = selectedContractorsIds[0] ?? "";
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selectedContractors.includes("_")
+      ? selectedContractors.split("_")[0]
+      : selectedContractors;
+
+    const success = await Scripts.createInteractionByRequestId(
       selectedRequestsIds[0],
-      selectedContractorsIds[0],
+      contractorId,
       phone
     );
+    if (success) setBindSuccess(success);
+    if (!success) {
+      showErrorMessage("Выберите обратившегося и обращение в активном статусе");
+      return;
+    }
     utils.setRequest(selectedRequestsIds[0]);
 
     const link = Scripts.getRequestPagePath();
@@ -239,7 +256,7 @@ export default function RequestList({
   const [searchDataWithQuery, setSearchDataWithQuery] =
     useState<RequestSearchData>(() => getSearchDataWithQuery());
 
-  const isDisabled = selectedRequestsIds.length === 0;
+  const isDisabled = selectedRequestsIds.length === 0 || bindSuccess === false;
 
   useEffect(() => {
     setSearchDataWithQuery(getSearchDataWithQuery());

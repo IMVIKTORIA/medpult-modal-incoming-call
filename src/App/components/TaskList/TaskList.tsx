@@ -66,6 +66,8 @@ export default function TaskList({
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [bindSuccess, setBindSuccess] = useState<boolean | null>(false);
+  const [assSuccess, setAddSuccess] = useState<boolean | null>(false);
 
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -92,20 +94,37 @@ export default function TaskList({
   /** Обработчик нажатия на кнопку "Привязать к задаче"  */
   const bindTask = async () => {
     if (!selectedTasksIds?.length || !selectedContractorsIds?.length) {
-      showErrorMessage("Выберите обратившегося и задачу");
+      showErrorMessage("Выберите обратившегося и задачу в активном статусе");
       return;
     }
     const phone = contractorsSearchData.phone || "";
 
-    await Scripts.createInteractionByTaskId(
+    const selectedContractors = selectedContractorsIds[0] ?? "";
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selectedContractors.includes("_")
+      ? selectedContractors.split("_")[0]
+      : selectedContractors;
+
+    const success = await Scripts.createInteractionByTaskId(
       selectedTasksIds[0],
-      selectedContractorsIds[0],
+      contractorId,
       phone
     );
-    utils.setRequest(selectedTasksIds[0]);
+    if (success) setBindSuccess(success);
+    if (!success) {
+      showErrorMessage("Выберите обратившегося и задачу в активном статусе");
+      return;
+    }
 
-    const link = Scripts.getRequestPagePath();
+    const requestId = await Scripts.getRequestIdByTaskId(selectedTasksIds[0]);
+    utils.setTask(requestId);
+    localStorage.setItem("taskId", selectedTasksIds[0]);
+
+    // Переход
+    const link = await Scripts.getRequestPagePath();
+
     const redirectUrl = new URL(window.location.origin + "/" + link);
+    if (requestId) redirectUrl.searchParams.set("request_id", requestId);
     if (selectedTasksIds[0])
       redirectUrl.searchParams.set("task_id", selectedTasksIds[0]);
     //utils.redirectSPA(redirectUrl.toString());
@@ -120,17 +139,26 @@ export default function TaskList({
   /** Обработчик нажатия на кнопку "Создать задачу"  */
   const newTask = async () => {
     if (!selectedRequestsIds?.length || !selectedContractorsIds?.length) {
-      showErrorMessage("Выберите обратившегося и обращение");
+      showErrorMessage("Выберите обратившегося и обращение в активном статусе");
       return;
     }
+    const selectedContractors = selectedContractorsIds[0] ?? "";
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selectedContractors.includes("_")
+      ? selectedContractors.split("_")[0]
+      : selectedContractors;
 
     if (contractorsSearchData.phone) {
-      // Открыть форму создания задачи
-      openNewTask(
+      //Открыть форму создания задачи
+      const success = await openNewTask(
         contractorsSearchData.phone,
-        selectedContractorsIds[0],
+        contractorId,
         selectedRequestsIds[0]
       );
+      if (success) setAddSuccess(success);
+      if (!success) {
+        showErrorMessage("Выберите обращение в активном статусе");
+      }
     }
   };
   /** Колонки списка */
@@ -210,7 +238,7 @@ export default function TaskList({
   const [searchDataWithQuery, setSearchDataWithQuery] =
     useState<TaskSearchData>(() => getSearchDataWithQuery());
 
-  const isDisabled = selectedTasksIds.length === 0;
+  const isDisabled = selectedTasksIds.length === 0 || bindSuccess === false;
 
   useEffect(() => {
     setSearchDataWithQuery(getSearchDataWithQuery());
@@ -224,7 +252,9 @@ export default function TaskList({
   ]);
 
   const isDisabledAdd =
-    selectedContractorsIds.length === 0 || selectedRequestsIds.length === 0;
+    selectedContractorsIds.length === 0 ||
+    selectedRequestsIds.length === 0 ||
+    assSuccess === false;
   return (
     <>
       <div className="request-list">

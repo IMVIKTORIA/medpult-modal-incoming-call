@@ -17,6 +17,7 @@ import Button from "../../../UIKit/Button/Button";
 import icons from "../../shared/icons";
 import Panel from "../Panel/Panel";
 import CustomInputSelect from "../CustomInputSelect/CustomInputSelect";
+import ColumnWithValidation from "../ColumnWithValidation/ColumnWithValidation";
 
 export interface ContractorListProps {
   /** Иденификаторы выбранных обратившихся */
@@ -71,8 +72,13 @@ export default function ContractorList({
       showErrorMessage("Выберите контрагента");
       return;
     }
+    const selected = selectedContractorsIds[0];
+    // Если id составной (contractorId_policyId) — берем только первую часть
+    const contractorId = selected.includes("_")
+      ? selected.split("_")[0]
+      : selected;
     // Открыть контрагента
-    openContractorInEditMode(selectedContractorsIds[0]);
+    openContractorInEditMode(contractorId);
   };
 
   /** Обработчик нажатия на контрагента*/
@@ -124,6 +130,7 @@ export default function ContractorList({
       name: "Окончание действия",
       code: "policyEndDate",
       fr: 1,
+      getCustomColumComponent: ColumnWithValidation,
     }),
     new ListColumnData({
       name: "Вид контрагента",
