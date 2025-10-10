@@ -173,6 +173,11 @@ export class TaskListData {
 export interface ContractorsSearchData {
   /** Телефон */
   phone?: string;
+
+  /** id выбранного застрахованного через глобальный поиск */
+  globalInsuredId?: string;
+  /** id полис */
+  globalPolicyId?: string;
 }
 
 /** Данные поиска дубликатов контрагента (с дополнительными полями) */

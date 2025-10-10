@@ -20,9 +20,17 @@ export default function TasksTab(props: TaskListProps) {
   const [sliderActive, setSliderActive] = useState(false);
   // Общее количество задач
   const [taskCount, setTaskCount] = useState<number>(0);
+
+  const effectiveInsuredIds = contractorsSearchData?.globalInsuredId
+    ? [contractorsSearchData.globalInsuredId]
+    : selectedInsuredIds;
+
   // Обновить общее количество задач
   async function updateTaskCount() {
-    if (!selectedContractorsIds?.length) {
+    if (
+      !selectedContractorsIds?.length &&
+      !contractorsSearchData?.globalInsuredId
+    ) {
       setTaskCount(0);
       return;
     }
@@ -37,11 +45,15 @@ export default function TasksTab(props: TaskListProps) {
   const [filteredTasksCount, setFilteredTasksCount] = useState<number>(0);
   // Обновление количества отфильтрованных по обращениям задач
   async function updateFilteredTaskCount() {
+    if (!selectedRequestsIds?.length && !effectiveInsuredIds?.length) {
+      setFilteredTasksCount(0);
+      return;
+    }
     // При выбранном обращении получить количество задач по этому обращению с указанными фильтрами
     const count = await Scripts.getFilteredTasksCount(
       selectedContractorsIds,
       selectedRequestsIds,
-      selectedInsuredIds,
+      effectiveInsuredIds,
       contractorsSearchData,
       sliderActive
     );
@@ -74,7 +86,7 @@ export default function TasksTab(props: TaskListProps) {
   const countTitle = (
     <span className="count">
       {getCountString(
-        selectedInsuredIds?.length || selectedRequestsIds?.length
+        effectiveInsuredIds?.length || selectedRequestsIds?.length
           ? filteredTasksCount
           : taskCount
       )}

@@ -46,6 +46,10 @@ export interface RequestSearchData extends ContractorsSearchData {
   isShowClosed?: boolean;
   /** Поле, по которому выполняется поиск */
   searchField?: string;
+  /** id застрахованного */
+  globalInsuredId?: string;
+  /** id полис */
+  globalPolicyId?: string;
 }
 
 /** Список обращений */

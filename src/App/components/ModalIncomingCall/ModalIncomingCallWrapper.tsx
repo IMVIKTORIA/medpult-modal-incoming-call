@@ -15,10 +15,15 @@ export default function ModalIncomingCallWrapper() {
     Scripts.OnInit().then(() => {
       const currentURL = new URL(window.location.href);
       const phone = currentURL.searchParams.get("phone") || undefined;
+      const insuredId = currentURL.searchParams.get("insuredId") || undefined;
+      const policyId = currentURL.searchParams.get("policyId") || undefined;
 
-      if (phone) {
-        setContractorsSearchData({ phone });
-      }
+      const data: ContractorsSearchData = {};
+      if (phone) data.phone = phone;
+      if (insuredId) data.globalInsuredId = insuredId;
+      if (policyId) data.globalPolicyId = policyId;
+
+      setContractorsSearchData(data);
       setIsLoading(false);
     });
   }, []);

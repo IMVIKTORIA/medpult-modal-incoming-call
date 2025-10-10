@@ -42,6 +42,9 @@ export interface InsuredSearchData extends ContractorsSearchData {
   searchField?: string;
   /** Выбранные обратившиеся */
   contractorsIds?: string[];
+  /** id застрахованного */
+  globalInsuredId?: string;
+  globalPolicyId?: string;
 }
 
 /** Список застрахованных */
@@ -221,13 +224,16 @@ export default function InsuredList({
     sortData?: SortData,
     searchData?: InsuredSearchData
   ): Promise<FetchData<InsuredListData>> => {
-    // Если контрагенты не выбраны — вернуть пустой список
-    if (!selectedContractorsIds.length) {
+    //Если нет выбранных контрагентов и нет insuredId — вернуть пустой список
+    const hasNoContractors = !searchData?.contractorsIds?.length;
+    const hasNoInsured = !searchData?.globalInsuredId;
+    if (hasNoContractors && hasNoInsured) {
       return {
         items: [],
         hasMore: false,
       };
     }
+
     const response = await Scripts.getInsuredList(page, sortData, searchData);
 
     return response;

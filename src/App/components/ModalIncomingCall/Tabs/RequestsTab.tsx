@@ -14,9 +14,17 @@ export default function RequestsTab(props: RequestListProps) {
   const [sliderActive, setSliderActive] = useState(false);
   // Общее количество обращений
   const [requestCount, setRequestCount] = useState<number>(0);
+
+  const effectiveInsuredIds = contractorsSearchData?.globalInsuredId
+    ? [contractorsSearchData.globalInsuredId]
+    : selectedInsuredIds;
+
   // Обновить общее количество обращений
   async function updateRequestCount() {
-    if (!selectedContractorsIds?.length) {
+    if (
+      !selectedContractorsIds?.length &&
+      !contractorsSearchData?.globalInsuredId
+    ) {
       setRequestCount(0);
       return;
     }
@@ -31,14 +39,14 @@ export default function RequestsTab(props: RequestListProps) {
   const [filteredRequestsCount, setFilteredRequestsCount] = useState<number>(0);
   // Обновление количества отфильтрованных по застрахованным обращений
   async function updateFilteredRequestsCount() {
-    if (!selectedInsuredIds?.length) {
+    if (!effectiveInsuredIds?.length) {
       setFilteredRequestsCount(0);
       return;
     }
     // При выбранном застрахованном получить количество обращений по этому застрахованному с указанными фильтрами
     const count = await Scripts.getFilteredRequestsCount(
       selectedContractorsIds,
-      selectedInsuredIds,
+      effectiveInsuredIds,
       contractorsSearchData,
       sliderActive
     );
@@ -70,7 +78,7 @@ export default function RequestsTab(props: RequestListProps) {
   const countTitle = (
     <span className="count">
       {getCountString(
-        selectedInsuredIds?.length ? filteredRequestsCount : requestCount
+        effectiveInsuredIds?.length ? filteredRequestsCount : requestCount
       )}
     </span>
   );
