@@ -95,6 +95,24 @@ const IntegrationButton = (
   </svg>
 );
 
+const IntegrationButtonSmall = (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M10 12.5H10.8333C11.7538 12.5 12.5 11.7538 12.5 10.8333V10M10 7.5H9.16667C8.24619 7.5 7.5 8.24619 7.5 9.16667V10M4.16667 2.5H10.8333C11.7538 2.5 12.5 3.24619 12.5 4.16667V7.5H15.8333C16.7538 7.5 17.5 8.24619 17.5 9.16667V15.8333C17.5 16.7538 16.7538 17.5 15.8333 17.5H9.16667C8.24619 17.5 7.5 16.7538 7.5 15.8333V12.5H4.16667C3.24619 12.5 2.5 11.7538 2.5 10.8333V4.16667C2.5 3.24619 3.24619 2.5 4.16667 2.5Z"
+      stroke="#A4A7AE"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
 const Triangle = (
   <svg
     width="24"
@@ -105,7 +123,7 @@ const Triangle = (
   >
     <path
       d="M6 9L12 15L18 9"
-      stroke="#1570EF"
+      stroke="#565A62"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -197,6 +215,24 @@ const Search = (
   </svg>
 );
 
+const Search20 = (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M13.5 13.5L17 17M14.6667 8.83334C14.6667 12.055 12.055 14.6667 8.83333 14.6667C5.61167 14.6667 3 12.055 3 8.83334C3 5.61168 5.61167 3 8.83333 3C12.055 3 14.6667 5.61168 14.6667 8.83334Z"
+      stroke="#1570EF"
+      stroke-width="1.575"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
 //Статусы задач
 const StatusQueue = (
   <svg
@@ -265,11 +301,13 @@ export default {
   AddLink,
   /**Интеграция */
   IntegrationButton,
+  IntegrationButtonSmall,
   /** Кнопка раскрытия списка */
   Triangle,
   Cross,
   Change,
   Search,
+  Search20,
   Arrow,
   Check,
   /** Статусы Задач */

@@ -178,6 +178,9 @@ export interface ContractorsSearchData {
   globalInsuredId?: string;
   /** id полис */
   globalPolicyId?: string;
+
+  /** id выбранного контрагента через поиск/заменить */
+  globalContractorId?: string;
 }
 
 /** Данные поиска дубликатов контрагента (с дополнительными полями) */

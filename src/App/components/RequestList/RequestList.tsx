@@ -66,7 +66,6 @@ export default function RequestList({
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [bindSuccess, setBindSuccess] = useState<boolean | null>(false);
 
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -148,7 +147,6 @@ export default function RequestList({
       contractorId,
       phone
     );
-    if (success) setBindSuccess(success);
     if (!success) {
       showErrorMessage("Выберите обратившегося и обращение в активном статусе");
       return;
@@ -208,7 +206,7 @@ export default function RequestList({
       name: "Тема обращения",
       code: "topic",
       fr: 1,
-      isSortable: true,
+      //isSortable: true,
     }),
     new ListColumnData({
       name: "Статус",
@@ -260,7 +258,7 @@ export default function RequestList({
   const [searchDataWithQuery, setSearchDataWithQuery] =
     useState<RequestSearchData>(() => getSearchDataWithQuery());
 
-  const isDisabled = selectedRequestsIds.length === 0 || bindSuccess === false;
+  const isDisabled = selectedRequestsIds.length === 0;
 
   useEffect(() => {
     setSearchDataWithQuery(getSearchDataWithQuery());

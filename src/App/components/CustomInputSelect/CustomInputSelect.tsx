@@ -27,7 +27,6 @@ function CustomInputSelect({
   cursor = "text",
   buttons,
 }: CustomInputSelectProps) {
-  //const [selectedField, setSelectedFieldLocal] = useState(searchFields[0] || "");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +68,14 @@ function CustomInputSelect({
       {searchFields.length > 0 && (
         <div className="custom-input-select__field" onClick={toggleDropdown}>
           <span>{selectedField}</span>
-          <span className="custom-input-select__arrow">{icons.Arrow}</span>
+          <span
+            className="custom-input-select__arrow"
+            style={{
+              transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+            }}
+          >
+            {icons.Arrow}
+          </span>
 
           {dropdownOpen && (
             <div className="custom-input-select__dropdown">

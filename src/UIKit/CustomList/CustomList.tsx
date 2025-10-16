@@ -50,6 +50,7 @@ type ListProps<SearchDataType = any, ItemType = any> = {
   selectedItems?: string[];
   /** Присвоить выбранные строки */
   setSelectedItems?: (ids: string[]) => void;
+  autoSelectSingleItem?: boolean;
 };
 
 /** Список данных в виде таблицы */
@@ -254,6 +255,23 @@ function CustomList<SearchDataType = any, ItemType = any>(
     );
   });
 
+  // Автоматически выбрать элемент, если он единственный
+  useEffect(() => {
+    if (
+      !isLoading &&
+      items.length === 1 &&
+      isSelectable &&
+      setSelectedItems &&
+      props.autoSelectSingleItem &&
+      (!selectedItems || selectedItems.length === 0)
+    ) {
+      const onlyItem = items[0];
+      if (onlyItem?.id) {
+        setSelectedItems([onlyItem.id]);
+      }
+    }
+  }, [isLoading, items]);
+
   return (
     <div className="custom-list">
       <div
@@ -295,7 +313,13 @@ function CustomList<SearchDataType = any, ItemType = any>(
             ? "custom-list__body_scrollable"
             : "custom-list__body"
         }
-        style={height ? { height: height } : { height: "10px", flex: 1 }}
+        // style={height ? { height: height } : { height: "10px", flex: 1 }}
+        style={{
+          height: height,
+          maxHeight: "280px",
+          overflow: "hidden",
+          overflowY: "auto",
+        }}
         ref={bodyRef}
         onScroll={onScroll}
       >

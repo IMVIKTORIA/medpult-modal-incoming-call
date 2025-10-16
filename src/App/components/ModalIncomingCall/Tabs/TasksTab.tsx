@@ -36,7 +36,8 @@ export default function TasksTab(props: TaskListProps) {
     }
     const count = await Scripts.getCountTask(
       selectedContractorsIds,
-      contractorsSearchData
+      contractorsSearchData,
+      sliderActive
     );
     setTaskCount(count);
   }

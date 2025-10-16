@@ -34,7 +34,7 @@ async function getContractorList(
   const mockData: ContractorListData = {
     /** Идентификатор */
     id: new ItemDataString("1"),
-    isIntegration: new MyItemData({ value: "", info: Math.random() < 0.5 }),
+    isIntegration: new MyItemData({ value: "", info: true }),
     fullname: new MyItemData({
       value: "Иванов Иван Иванович",
       info: `${Math.random() * 10000}`,
@@ -43,7 +43,7 @@ async function getContractorList(
     birthdate: new ItemDataString("01.01.1991"),
     policy: new ItemDataString("00SB755380849982/1"),
     policyStartDate: new ItemDataString("20.01.2025"),
-    policyEndDate: { value: "20.01.2026", isValid: Math.random() < 0.5 },
+    policyEndDate: { value: "20.01.2026", isValid: false },
     type: new ItemDataString("Застрахованный"),
     adress: new ItemDataString("г. Москва, ул. Тверская 121/1"),
   };
@@ -58,7 +58,36 @@ async function getContractorList(
           data: new ContractorListData(mockData),
         };
       }),
-    hasMore: true,
+    hasMore: false,
+  };
+}
+
+/** Получение обратившегося */
+async function getContractorById(
+  contractorId: string,
+  phone?: string
+): Promise<{ id: string; data: ContractorListData } | null> {
+  const mockData: ContractorListData = {
+    /** Идентификатор */
+    id: new ItemDataString("1"),
+    isIntegration: new MyItemData({ value: "", info: true }),
+    fullname: new MyItemData({
+      value: "Иванов Иван Иванович",
+      info: `${Math.random() * 10000}`,
+    }),
+    phone: new ItemDataString(formatPhone("79998887766")),
+    birthdate: new ItemDataString("01.01.1991"),
+    policy: new ItemDataString("00SB755380849982/1"),
+    policyStartDate: new ItemDataString("20.01.2025"),
+    policyEndDate: { value: "20.01.2026", isValid: false },
+    type: new ItemDataString("Застрахованный"),
+    adress: new ItemDataString("г. Москва, ул. Тверская 121/1"),
+  };
+  await randomDelay();
+
+  return {
+    id: contractorId,
+    data: new ContractorListData(mockData),
   };
 }
 
@@ -208,7 +237,8 @@ async function getCountInsured(searchData: ContractorsSearchData) {
 /** Получить количество обращений*/
 async function getCountRequest(
   contractorsIds: string[],
-  searchData: ContractorsSearchData
+  searchData: ContractorsSearchData,
+  isShowClosed: boolean
 ) {
   await randomDelay();
   return 4;
@@ -216,7 +246,8 @@ async function getCountRequest(
 /** Получить количество задач*/
 async function getCountTask(
   contractorsIds: string[],
-  searchData: ContractorsSearchData
+  searchData: ContractorsSearchData,
+  isShowClosed: boolean
 ) {
   await randomDelay();
   return 10;
@@ -321,6 +352,8 @@ export default {
   getInsuredList,
   getRequestList,
   getTaskList,
+
+  getContractorById,
 
   getCountConractor,
   getCountInsured,

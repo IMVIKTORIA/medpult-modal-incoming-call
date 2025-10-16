@@ -14,7 +14,7 @@
     user-select: none;
     padding: 6px 10px;
     border-right: 1px solid #ccc;
-    min-width: 100px;
+    //min-width: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -27,7 +27,11 @@
   }
 
   &__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-left: 6px;
+    transform-origin: center;
   }
 
   &__dropdown {
@@ -54,14 +58,14 @@
     padding: 8px;
     cursor: pointer;
     transition: background-color 0.2s;
+    height: 40px;
 
     &:hover {
-      background-color: #565a621f;
+      background-color: #565a620f;
       border-radius: 8px;
     }
 
     &__active {
-      background-color: #565a621f;
       border-radius: 8px;
     }
 

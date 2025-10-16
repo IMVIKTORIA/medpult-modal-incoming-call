@@ -174,6 +174,14 @@ export default function ContractorList({
   }, [contractorsSearchData, searchQueryDebounced, selectedSearchField]);
 
   const isDisabled = selectedContractorsIds.length === 0;
+
+  useEffect(() => {
+    // Автоматически выбрать контрагента, если он пришёл из URL
+    if (contractorsSearchData.globalContractorId && setSelectedContractorsIds) {
+      setSelectedContractorsIds([contractorsSearchData.globalContractorId]);
+    }
+  }, [contractorsSearchData.globalContractorId]);
+
   return (
     <>
       <Panel
@@ -214,6 +222,7 @@ export default function ContractorList({
               getDataHandler={Scripts.getContractorList}
               searchData={searchDataWithQuery}
               searchFields={selectedSearchField ? [selectedSearchField] : []}
+              autoSelectSingleItem={true}
               isSelectable={true}
               isMultipleSelect={false}
               setSelectedItems={(ids: string[]) =>

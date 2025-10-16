@@ -18,10 +18,15 @@ export default function ModalIncomingCallWrapper() {
       const insuredId = currentURL.searchParams.get("insuredId") || undefined;
       const policyId = currentURL.searchParams.get("policyId") || undefined;
 
+      const globalContractorId =
+        currentURL.searchParams.get("contractorId") || undefined;
+
       const data: ContractorsSearchData = {};
       if (phone) data.phone = phone;
       if (insuredId) data.globalInsuredId = insuredId;
       if (policyId) data.globalPolicyId = policyId;
+
+      if (globalContractorId) data.globalContractorId = globalContractorId;
 
       setContractorsSearchData(data);
       setIsLoading(false);

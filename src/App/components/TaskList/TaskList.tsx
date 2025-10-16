@@ -70,8 +70,6 @@ export default function TaskList({
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [bindSuccess, setBindSuccess] = useState<boolean | null>(false);
-  const [assSuccess, setAddSuccess] = useState<boolean | null>(false);
 
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -114,7 +112,6 @@ export default function TaskList({
       contractorId,
       phone
     );
-    if (success) setBindSuccess(success);
     if (!success) {
       showErrorMessage("Выберите обратившегося и задачу в активном статусе");
       return;
@@ -159,7 +156,6 @@ export default function TaskList({
         contractorId,
         selectedRequestsIds[0]
       );
-      if (success) setAddSuccess(success);
       if (!success) {
         showErrorMessage("Выберите обращение в активном статусе");
       }
@@ -242,7 +238,7 @@ export default function TaskList({
   const [searchDataWithQuery, setSearchDataWithQuery] =
     useState<TaskSearchData>(() => getSearchDataWithQuery());
 
-  const isDisabled = selectedTasksIds.length === 0 || bindSuccess === false;
+  const isDisabled = selectedTasksIds.length === 0;
 
   useEffect(() => {
     setSearchDataWithQuery(getSearchDataWithQuery());
@@ -256,9 +252,7 @@ export default function TaskList({
   ]);
 
   const isDisabledAdd =
-    selectedContractorsIds.length === 0 ||
-    selectedRequestsIds.length === 0 ||
-    assSuccess === false;
+    selectedContractorsIds.length === 0 || selectedRequestsIds.length === 0;
   return (
     <>
       <div className="request-list">

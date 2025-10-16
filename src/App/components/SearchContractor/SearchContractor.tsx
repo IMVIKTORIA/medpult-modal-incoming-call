@@ -12,22 +12,52 @@ export default function SearchContractor({
 }: SearchContractorProps) {
   const [contractors, setContractors] = useState<ContractorListData[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     async function fetchContractors() {
       setLoading(true);
+
+      //Если пришёл конкретный contractorId — подгружаем именно его
+      if (contractorsSearchData.globalContractorId) {
+        const contractor = await Scripts.getContractorById(
+          contractorsSearchData.globalContractorId,
+          contractorsSearchData.phone
+        );
+        if (contractor) {
+          setContractors([contractor.data]);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Если нет id — обычная логика
       const result = await Scripts.getContractorList(
         0,
         undefined,
         contractorsSearchData
       );
       const items = result.items.map((i) => i.data);
-
       setContractors(items);
       setLoading(false);
     }
+
     fetchContractors();
   }, [contractorsSearchData]);
+
+  // useEffect(() => {
+  //   async function fetchContractors() {
+  //     setLoading(true);
+  //     const result = await Scripts.getContractorList(
+  //       0,
+  //       undefined,
+  //       contractorsSearchData
+  //     );
+  //     const items = result.items.map((i) => i.data);
+
+  //     setContractors(items);
+  //     setLoading(false);
+  //   }
+  //   fetchContractors();
+  // }, [contractorsSearchData]);
 
   /** Обработчик нажатия на контрагента*/
   const onClickContractor = async (contractor: ContractorListData) => {
@@ -42,145 +72,184 @@ export default function SearchContractor({
     const redirectUrl = new URL(window.location.origin + "/" + link);
     if (contractorsSearchData.phone)
       redirectUrl.searchParams.set("phone", contractorsSearchData.phone);
-    if (contractorsSearchData.phone)
-      localStorage.setItem("medpult-call-phone", contractorsSearchData.phone);
-    utils.redirectSPA(redirectUrl.toString());
+    if (contractorsSearchData.phone) utils.redirectSPA(redirectUrl.toString());
+  };
+
+  const applyMaskPhone = (value: string): string => {
+    if (value === undefined) return "";
+    const match = value.match(
+      /(\+?7|8)\D*(\d{1,3})?\D*(\d{1,3})?\D*(\d{1,2})?\D*(\d{1,2})?/
+    );
+    if (!match) return "";
+    return match
+      .slice(1)
+      .filter((val) => val)
+      .join(" ")
+      .replace(/^(7|8)/, "+7");
   };
 
   const contractor = contractors.length === 1 ? contractors[0] : undefined;
   return (
     <div className="search-contractor">
       <span className="search-contractor__title">Обратившийся</span>
-      <div className="search-contractor__content">
-        {contractor ? (
-          <>
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">
-                Наименование
-              </span>
-              <div className="search-contractor__field__group">
-                <span
-                  className="search-contractor__field__value search-contractor__field__value__link"
-                  title={contractor?.fullname?.value}
-                  onClick={() => onClickContractor(contractor)}
-                >
-                  {contractor?.fullname?.value}
-                </span>
-                <span
-                  className="search-contractor__field__button"
-                  onClick={() => searchContractor()}
-                >
-                  {icons.Change} <span>Заменить</span>
-                </span>
-              </div>
-            </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">Телефон</span>
+      {contractor ? (
+        <div className="search-contractor__content">
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "400px" }}
+          >
+            <span className="search-contractor__field__label">
+              Наименование
+            </span>
+            <div className="search-contractor__field__group">
               <span
-                className="search-contractor__field__value"
-                title={contractor?.phone?.value}
+                className="search-contractor__field__value search-contractor__field__value__link"
+                title={contractor?.fullname?.value}
+                onClick={() => onClickContractor(contractor)}
               >
-                {contractor?.phone?.value}
-              </span>
-            </div>
-
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">
-                Дата рождения
+                {contractor?.isIntegration?.info &&
+                  icons.IntegrationButtonSmall}
+                {contractor?.fullname?.value}
               </span>
               <span
-                className="search-contractor__field__value"
-                title={contractor?.birthdate?.value}
+                className="search-contractor__field__button"
+                onClick={() => searchContractor()}
               >
-                {contractor?.birthdate?.value}
+                {icons.Change} <span>Заменить</span>
               </span>
             </div>
+          </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">Полис</span>
-              <span
-                className="search-contractor__field__value"
-                title={contractor?.policy?.value}
-              >
-                {contractor?.policy?.value}
-              </span>
-            </div>
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "130px" }}
+          >
+            <span className="search-contractor__field__label">Телефон</span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.phone?.value}
+            >
+              {applyMaskPhone(contractor?.phone?.value ?? "")}
+            </span>
+          </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">
-                Начало действия
-              </span>
-              <span
-                className="search-contractor__field__value"
-                title={contractor?.policyStartDate?.value}
-              >
-                {contractor?.policyStartDate?.value}
-              </span>
-            </div>
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "120px" }}
+          >
+            <span className="search-contractor__field__label">
+              Дата рождения
+            </span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.birthdate?.value}
+            >
+              {contractor?.birthdate?.value}
+            </span>
+          </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">
-                Окончание действия
-              </span>
-              <span
-                className="search-contractor__field__value"
-                title={contractor?.policyEndDate?.value}
-              >
-                {contractor?.policyEndDate?.value}
-              </span>
-            </div>
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "160px" }}
+          >
+            <span className="search-contractor__field__label">Полис</span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.policy?.value}
+            >
+              {contractor?.policy?.value}
+            </span>
+          </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">
-                Вид контрагента
-              </span>
-              <span
-                className="search-contractor__field__value"
-                title={contractor?.type?.value}
-              >
-                {contractor?.type?.value}
-              </span>
-            </div>
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "120px" }}
+          >
+            <span className="search-contractor__field__label">
+              Начало действия
+            </span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.policyStartDate?.value}
+            >
+              {contractor?.policyStartDate?.value}
+            </span>
+          </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">Адрес</span>
-              <span
-                className="search-contractor__field__value"
-                title={contractor?.adress?.value}
-              >
-                {contractor?.adress?.value}
-              </span>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">
-                Наименование
-              </span>
-              <div className="search-contractor__field__group">
-                <span
-                  className="search-contractor__field__button"
-                  onClick={() => searchContractor()}
-                >
-                  {icons.Search} <span>Поиск</span>
-                </span>
-              </div>
-            </div>
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "130px" }}
+          >
+            <span className="search-contractor__field__label">
+              Окончание действия
+            </span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.policyEndDate?.value}
+              style={{
+                color:
+                  contractor?.policyEndDate?.isValid === false
+                    ? "#ff4545"
+                    : "#303337",
+              }}
+            >
+              {contractor?.policyEndDate?.value}
+            </span>
+          </div>
 
-            <div className="search-contractor__field">
-              <span className="search-contractor__field__label">Телефон</span>
+          <div
+            className="search-contractor__field"
+            style={{ maxWidth: "120px" }}
+          >
+            <span className="search-contractor__field__label">
+              Вид контрагента
+            </span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.type?.value}
+            >
+              {contractor?.type?.value}
+            </span>
+          </div>
+
+          <div className="search-contractor__field">
+            <span className="search-contractor__field__label">Адрес</span>
+            <span
+              className="search-contractor__field__value"
+              title={contractor?.adress?.value}
+            >
+              {contractor?.adress?.value}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="search-contractor__search">
+          <div className="search-contractor__field">
+            <span className="search-contractor__field__label">
+              Наименование
+            </span>
+            <div className="search-contractor__field__group">
               <span
-                className="search-contractor__field__value"
-                title={contractorsSearchData.phone}
+                className="search-contractor__field__button"
+                onClick={() => searchContractor()}
               >
-                {contractorsSearchData.phone}
+                {icons.Search20} <span>Поиск</span>
               </span>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+
+          <div className="search-contractor__field">
+            <span className="search-contractor__field__label">Телефон</span>
+            <span
+              className="search-contractor__field__value"
+              title={contractorsSearchData.phone}
+            >
+              {contractorsSearchData.phone}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

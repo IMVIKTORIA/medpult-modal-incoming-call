@@ -270,15 +270,9 @@ const CheckedRadio = (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <circle
-      cx="10"
-      cy="10"
-      r="9.375"
-      fill="white"
-      stroke="#BFBFC2"
-      stroke-width="1.25"
-    />
-    <circle cx="10" cy="10" r="6.875" fill="#1570ef" />
+    <rect x="0.5" y="0.5" width="19" height="19" rx="9.5" fill="#1570EF" />
+    <rect x="0.5" y="0.5" width="19" height="19" rx="9.5" stroke="#1570EF" />
+    <circle cx="10" cy="10" r="4" fill="white" />
   </svg>
 );
 

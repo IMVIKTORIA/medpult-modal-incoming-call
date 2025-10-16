@@ -39,6 +39,16 @@
     &__triangle {
       user-select: none;
       transition: transform 0.05s;
+      height: 24px !important;
+
+      &:hover {
+        background-color: #565a621f;
+        border-radius: 4px;
+      }
+      &:active {
+        background-color: #565a622e;
+        border-radius: 4px;
+      }
 
       &_open {
         transform: rotate(180deg);

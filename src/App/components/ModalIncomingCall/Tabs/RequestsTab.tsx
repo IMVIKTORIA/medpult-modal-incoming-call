@@ -30,7 +30,8 @@ export default function RequestsTab(props: RequestListProps) {
     }
     const count = await Scripts.getCountRequest(
       selectedContractorsIds,
-      contractorsSearchData
+      contractorsSearchData,
+      sliderActive
     );
     setRequestCount(count);
   }
