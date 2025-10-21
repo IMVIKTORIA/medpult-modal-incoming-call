@@ -43,6 +43,8 @@ export default function ModalIncomingCall({
     selectedInsuredIds: selectedInsuredIds,
     setSelectedInsuredIds: setSelectedInsuredIds,
     selectedContractorsIds: selectedContractorsIds,
+    selectedRequestsIds: selectedRequestsIds,
+    selectedTasksIds: selectedTasksIds,
   });
 
   // Вкладка обращения
@@ -52,6 +54,7 @@ export default function ModalIncomingCall({
     selectedRequestsIds: selectedRequestsIds,
     setSelectedRequestsIds: setSelectedRequestsIds,
     selectedContractorsIds: selectedContractorsIds,
+    selectedTasksIds: selectedTasksIds,
   });
 
   // Вкладка задачи
@@ -74,7 +77,10 @@ export default function ModalIncomingCall({
 
       <div className="incoming-call-modal__content">
         <div className="incoming-call-modal__search">
-          <SearchContractor contractorsSearchData={contractorsSearchData} />
+          <SearchContractor
+            contractorsSearchData={contractorsSearchData}
+            selectedContractorsIds={selectedContractorsIds}
+          />
         </div>
 
         <div className="incoming-call-modal__panel">

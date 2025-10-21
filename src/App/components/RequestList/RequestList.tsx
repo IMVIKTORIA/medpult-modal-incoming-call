@@ -32,6 +32,8 @@ export type RequestListProps = {
   setSliderActive?: React.Dispatch<React.SetStateAction<boolean>>;
   /** Иденификаторы выбранных обратившихся */
   selectedContractorsIds: string[];
+  /** Иденификаторы выбранных задач */
+  selectedTasksIds: string[];
 };
 
 /** Данные поиска обращений */
@@ -50,6 +52,8 @@ export interface RequestSearchData extends ContractorsSearchData {
   globalInsuredId?: string;
   /** id полис */
   globalPolicyId?: string;
+  /** Выбранные задачи */
+  tasksIds?: string[];
 }
 
 /** Список обращений */
@@ -61,11 +65,29 @@ export default function RequestList({
   sliderActive,
   setSliderActive,
   selectedContractorsIds,
+  selectedTasksIds,
 }: RequestListProps) {
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [isClosedRequest, setIsClosedRequest] = useState(false);
+
+  useEffect(() => {
+    const checkRequestStatus = async () => {
+      if (!selectedRequestsIds?.length) {
+        setIsClosedRequest(false);
+        return;
+      }
+
+      const requestId = selectedRequestsIds[0];
+      const closed = await Scripts.isRequestClosed(requestId);
+      setIsClosedRequest(closed);
+    };
+
+    checkRequestStatus();
+  }, [selectedRequestsIds]);
 
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -238,6 +260,7 @@ export default function RequestList({
       contractorsIds: selectedContractorsIds,
       isShowClosed: sliderActive,
       searchField: selectedSearchField,
+      tasksIds: selectedTasksIds,
     };
   };
 
@@ -258,7 +281,7 @@ export default function RequestList({
   const [searchDataWithQuery, setSearchDataWithQuery] =
     useState<RequestSearchData>(() => getSearchDataWithQuery());
 
-  const isDisabled = selectedRequestsIds.length === 0;
+  const isDisabled = selectedRequestsIds.length === 0 || isClosedRequest;
 
   useEffect(() => {
     setSearchDataWithQuery(getSearchDataWithQuery());
@@ -268,6 +291,7 @@ export default function RequestList({
     selectedContractorsIds,
     contractorsSearchData,
     sliderActive,
+    selectedTasksIds,
   ]);
 
   const isDisabledAdd = selectedContractorsIds.length === 0;

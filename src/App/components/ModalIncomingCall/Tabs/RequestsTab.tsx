@@ -7,8 +7,12 @@ import Scripts from "../../../shared/utils/clientScripts.ts";
 
 /** Список обращений */
 export default function RequestsTab(props: RequestListProps) {
-  const { selectedInsuredIds, contractorsSearchData, selectedContractorsIds } =
-    props;
+  const {
+    selectedInsuredIds,
+    contractorsSearchData,
+    selectedContractorsIds,
+    selectedTasksIds,
+  } = props;
 
   //Состояние слайдера
   const [sliderActive, setSliderActive] = useState(false);
@@ -31,7 +35,8 @@ export default function RequestsTab(props: RequestListProps) {
     const count = await Scripts.getCountRequest(
       selectedContractorsIds,
       contractorsSearchData,
-      sliderActive
+      sliderActive,
+      selectedTasksIds
     );
     setRequestCount(count);
   }
@@ -49,7 +54,8 @@ export default function RequestsTab(props: RequestListProps) {
       selectedContractorsIds,
       effectiveInsuredIds,
       contractorsSearchData,
-      sliderActive
+      sliderActive,
+      selectedTasksIds
     );
     setFilteredRequestsCount(count);
   }
@@ -69,6 +75,7 @@ export default function RequestsTab(props: RequestListProps) {
     selectedContractorsIds,
     contractorsSearchData,
     sliderActive,
+    selectedTasksIds,
   ]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);

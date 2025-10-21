@@ -32,6 +32,10 @@ export type InsuredListProps = {
   contractorsSearchData: ContractorsSearchData;
   /** Иденификаторы выбранных обратившихся */
   selectedContractorsIds: string[];
+  /** Иденификаторы выбранных обращения */
+  selectedRequestsIds: string[];
+  /** Иденификаторы выбранных задач */
+  selectedTasksIds: string[];
 };
 
 /** Данные поиска дубликатов застрахованного */
@@ -44,7 +48,12 @@ export interface InsuredSearchData extends ContractorsSearchData {
   contractorsIds?: string[];
   /** id застрахованного */
   globalInsuredId?: string;
+  /** id полиса */
   globalPolicyId?: string;
+  /** Выбранные обращения */
+  requestIds?: string[];
+  /** Выбранные задачи */
+  tasksIds?: string[];
 }
 
 /** Список застрахованных */
@@ -53,6 +62,8 @@ export default function InsuredList({
   setSelectedInsuredIds,
   contractorsSearchData,
   selectedContractorsIds,
+  selectedRequestsIds,
+  selectedTasksIds,
 }: InsuredListProps) {
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -204,6 +215,8 @@ export default function InsuredList({
       searchQuery: searchQueryDebounced,
       searchField: selectedSearchField,
       contractorsIds: selectedContractorsIds,
+      requestIds: selectedRequestsIds,
+      tasksIds: selectedTasksIds,
     });
   useEffect(() => {
     setSearchDataWithQuery({
@@ -211,12 +224,16 @@ export default function InsuredList({
       searchQuery: searchQueryDebounced,
       searchField: selectedSearchField,
       contractorsIds: selectedContractorsIds,
+      requestIds: selectedRequestsIds,
+      tasksIds: selectedTasksIds,
     });
   }, [
     contractorsSearchData,
     searchQueryDebounced,
     selectedSearchField,
     selectedContractorsIds,
+    selectedRequestsIds,
+    selectedTasksIds,
   ]);
 
   const handleGetData = async (

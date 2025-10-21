@@ -6,29 +6,43 @@ import utils, { redirectSPA, openContractor } from "../../shared/utils/utils";
 
 type SearchContractorProps = {
   contractorsSearchData: ContractorsSearchData;
+  selectedContractorsIds: string[];
 };
 export default function SearchContractor({
   contractorsSearchData,
+  selectedContractorsIds,
 }: SearchContractorProps) {
   const [contractors, setContractors] = useState<ContractorListData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  //Разделение составного Id
+  function parseSelectedId(id: string): {
+    contractorId: string;
+    policyId?: string;
+  } {
+    const [contractorId, policyId] = id.split("_");
+    return { contractorId, policyId };
+  }
+
   useEffect(() => {
     async function fetchContractors() {
       setLoading(true);
-
-      //Если пришёл конкретный contractorId — подгружаем именно его
-      if (contractorsSearchData.globalContractorId) {
-        const contractor = await Scripts.getContractorById(
-          contractorsSearchData.globalContractorId,
-          contractorsSearchData.phone
+      //Если есть выбранный контаргент
+      if (selectedContractorsIds && selectedContractorsIds.length > 0) {
+        const { contractorId, policyId } = parseSelectedId(
+          selectedContractorsIds[0]
         );
-        if (contractor) {
+        const contractor = await Scripts.getContractorById(
+          contractorId,
+          contractorsSearchData.phone,
+          policyId
+        );
+        if (contractor?.data) {
           setContractors([contractor.data]);
           setLoading(false);
           return;
         }
       }
-
       // Если нет id — обычная логика
       const result = await Scripts.getContractorList(
         0,
@@ -41,7 +55,7 @@ export default function SearchContractor({
     }
 
     fetchContractors();
-  }, [contractorsSearchData]);
+  }, [contractorsSearchData, selectedContractorsIds]);
 
   // useEffect(() => {
   //   async function fetchContractors() {

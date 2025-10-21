@@ -71,6 +71,41 @@ export default function TaskList({
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const [isClosedRequest, setIsClosedRequest] = useState(false);
+  const [isClosedTask, setIsClosedTask] = useState(false);
+
+  //Закрыто ли обращение
+  useEffect(() => {
+    const checkRequestStatus = async () => {
+      if (!selectedRequestsIds?.length) {
+        setIsClosedRequest(false);
+        return;
+      }
+
+      const requestId = selectedRequestsIds[0];
+      const closed = await Scripts.isRequestClosed(requestId);
+      setIsClosedRequest(closed);
+    };
+
+    checkRequestStatus();
+  }, [selectedRequestsIds]);
+
+  //Закрыта ли задача
+  useEffect(() => {
+    const checkTaskStatus = async () => {
+      if (!selectedTasksIds?.length) {
+        setIsClosedTask(false);
+        return;
+      }
+
+      const taskId = selectedTasksIds[0];
+      const closed = await Scripts.isTaskClosed(taskId);
+      setIsClosedTask(closed);
+    };
+
+    checkTaskStatus();
+  }, [selectedTasksIds]);
+
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
 
@@ -157,7 +192,9 @@ export default function TaskList({
         selectedRequestsIds[0]
       );
       if (!success) {
-        showErrorMessage("Выберите обращение в активном статусе");
+        showErrorMessage(
+          "Выберите обратившегося и обращение в активном статусе"
+        );
       }
     }
   };
@@ -238,7 +275,7 @@ export default function TaskList({
   const [searchDataWithQuery, setSearchDataWithQuery] =
     useState<TaskSearchData>(() => getSearchDataWithQuery());
 
-  const isDisabled = selectedTasksIds.length === 0;
+  const isDisabled = selectedTasksIds.length === 0 || isClosedTask;
 
   useEffect(() => {
     setSearchDataWithQuery(getSearchDataWithQuery());
@@ -252,7 +289,9 @@ export default function TaskList({
   ]);
 
   const isDisabledAdd =
-    selectedContractorsIds.length === 0 || selectedRequestsIds.length === 0;
+    selectedContractorsIds.length === 0 ||
+    selectedRequestsIds.length === 0 ||
+    isClosedRequest;
   return (
     <>
       <div className="request-list">

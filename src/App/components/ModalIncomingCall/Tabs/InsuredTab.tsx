@@ -12,6 +12,8 @@ export default function InsuredTab(props: InsuredListProps) {
     selectedInsuredIds,
     setSelectedInsuredIds,
     selectedContractorsIds,
+    selectedRequestsIds,
+    selectedTasksIds,
   } = props;
 
   // Общее количество застрахованных
@@ -28,7 +30,9 @@ export default function InsuredTab(props: InsuredListProps) {
     // При выбранном обратившемся получить количество застрахованных по этому обратившемуся с указанными фильтрами
     const count = await Scripts.getFilteredInsuredCount(
       selectedContractorsIds,
-      contractorsSearchData
+      contractorsSearchData,
+      selectedRequestsIds,
+      selectedTasksIds
     );
     setFilteredInsuredCount(count);
   }
@@ -37,6 +41,14 @@ export default function InsuredTab(props: InsuredListProps) {
   async function updateCounts() {
     //const totalCount = await Scripts.getCountInsured(contractorsSearchData);
     if (contractorsSearchData.globalInsuredId) {
+      setInsuredCount(1);
+      setFilteredInsuredCount(1);
+      return;
+    }
+    if (
+      (selectedRequestsIds && selectedRequestsIds.length > 0) ||
+      (selectedTasksIds && selectedTasksIds.length > 0)
+    ) {
       setInsuredCount(1);
       setFilteredInsuredCount(1);
       return;
@@ -51,7 +63,12 @@ export default function InsuredTab(props: InsuredListProps) {
   useEffect(() => {
     setIsLoading(true);
     updateCounts().then(() => setIsLoading(false));
-  }, [selectedContractorsIds, contractorsSearchData]);
+  }, [
+    selectedContractorsIds,
+    contractorsSearchData,
+    selectedRequestsIds,
+    selectedTasksIds,
+  ]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   function getCountString(count: number) {
@@ -70,6 +87,8 @@ export default function InsuredTab(props: InsuredListProps) {
         setSelectedInsuredIds={setSelectedInsuredIds}
         contractorsSearchData={contractorsSearchData}
         selectedContractorsIds={selectedContractorsIds}
+        selectedRequestsIds={selectedRequestsIds}
+        selectedTasksIds={selectedTasksIds}
       />
     </TabItem>
   );

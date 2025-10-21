@@ -50,7 +50,7 @@ async function getContractorList(
   await randomDelay();
 
   return {
-    items: Array(1)
+    items: Array(10)
       .fill(0)
       .map((data, index) => {
         return {
@@ -65,7 +65,8 @@ async function getContractorList(
 /** Получение обратившегося */
 async function getContractorById(
   contractorId: string,
-  phone?: string
+  phone?: string,
+  policyId?: string
 ): Promise<{ id: string; data: ContractorListData } | null> {
   const mockData: ContractorListData = {
     /** Идентификатор */
@@ -238,7 +239,8 @@ async function getCountInsured(searchData: ContractorsSearchData) {
 async function getCountRequest(
   contractorsIds: string[],
   searchData: ContractorsSearchData,
-  isShowClosed: boolean
+  isShowClosed: boolean,
+  tasksIds: string[]
 ) {
   await randomDelay();
   return 4;
@@ -282,7 +284,9 @@ function getSelectContractorPagePath(): string {
 /** Получить количество отфильтрованных застрахованных по выбранному обратившемуся */
 async function getFilteredInsuredCount(
   contractorsIds: string[],
-  contractorsSearchData: ContractorsSearchData
+  contractorsSearchData: ContractorsSearchData,
+  requestIds: string[],
+  tasksIds: string[]
 ) {
   await randomDelay();
   // TODO: Логика
@@ -293,7 +297,8 @@ async function getFilteredRequestsCount(
   contractorsIds: string[],
   insuredIds: string[],
   contractorsSearchData: ContractorsSearchData,
-  isShowClosed: boolean
+  isShowClosed: boolean,
+  tasksIds: string[]
 ) {
   await randomDelay();
   // TODO: Логика
@@ -344,6 +349,14 @@ async function createInteractionByTaskId(
   return;
 }
 
+async function isRequestClosed(requestId: string): Promise<boolean> {
+  return false;
+}
+
+async function isTaskClosed(requestId: string): Promise<boolean> {
+  return false;
+}
+
 async function OnInit(): Promise<void> {
   await randomDelay();
 }
@@ -375,6 +388,9 @@ export default {
 
   createInteractionByRequestId,
   createInteractionByTaskId,
+
+  isRequestClosed,
+  isTaskClosed,
 
   OnInit,
 };

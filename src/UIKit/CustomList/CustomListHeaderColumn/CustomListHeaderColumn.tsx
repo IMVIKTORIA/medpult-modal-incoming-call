@@ -13,16 +13,29 @@ function CustomListHeaderColumn(props: ListColumnProps) {
     props;
 
   /** Переключение режима сортировки для колонки */
+  // const toggleSortColumn = () => {
+  //   let data: SortData | undefined = sortData;
+
+  //   if (data?.code !== code) {
+  //     data = new SortData({ code, isAscending: true });
+  //   } else if (data.isAscending) {
+  //     data = new SortData({ code, isAscending: false });
+  //   } else {
+  //     data = undefined;
+  //   }
+  //   handleSortClick(data);
+  // };
+
   const toggleSortColumn = () => {
     let data: SortData | undefined = sortData;
 
     if (data?.code !== code) {
       data = new SortData({ code, isAscending: true });
-    } else if (data.isAscending) {
-      data = new SortData({ code, isAscending: false });
     } else {
-      data = undefined;
+      // просто переключаем направление
+      data = new SortData({ code, isAscending: !data.isAscending });
     }
+
     handleSortClick(data);
   };
 
