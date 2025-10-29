@@ -292,6 +292,7 @@ export default function TaskList({
     selectedContractorsIds.length === 0 ||
     selectedRequestsIds.length === 0 ||
     isClosedRequest;
+
   return (
     <>
       <div className="request-list">

@@ -40,6 +40,14 @@ export default function InsuredTab(props: InsuredListProps) {
   // Обновить количества
   async function updateCounts() {
     //const totalCount = await Scripts.getCountInsured(contractorsSearchData);
+    if (
+      (!selectedContractorsIds || selectedContractorsIds.length === 0) &&
+      !contractorsSearchData.globalInsuredId
+    ) {
+      setInsuredCount(0);
+      setFilteredInsuredCount(0);
+      return;
+    }
     if (contractorsSearchData.globalInsuredId) {
       setInsuredCount(1);
       setFilteredInsuredCount(1);

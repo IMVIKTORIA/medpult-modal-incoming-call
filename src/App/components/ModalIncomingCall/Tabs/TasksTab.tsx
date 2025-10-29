@@ -28,8 +28,9 @@ export default function TasksTab(props: TaskListProps) {
   // Обновить общее количество задач
   async function updateTaskCount() {
     if (
-      !selectedContractorsIds?.length &&
-      !contractorsSearchData?.globalInsuredId
+      (!selectedContractorsIds?.length &&
+        !contractorsSearchData?.globalInsuredId) ||
+      !selectedContractorsIds.length
     ) {
       setTaskCount(0);
       return;
@@ -46,7 +47,10 @@ export default function TasksTab(props: TaskListProps) {
   const [filteredTasksCount, setFilteredTasksCount] = useState<number>(0);
   // Обновление количества отфильтрованных по обращениям задач
   async function updateFilteredTaskCount() {
-    if (!selectedRequestsIds?.length && !effectiveInsuredIds?.length) {
+    if (
+      (!selectedRequestsIds?.length && !effectiveInsuredIds?.length) ||
+      !selectedContractorsIds.length
+    ) {
       setFilteredTasksCount(0);
       return;
     }

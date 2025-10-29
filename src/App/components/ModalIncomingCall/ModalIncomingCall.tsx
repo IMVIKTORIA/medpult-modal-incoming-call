@@ -67,6 +67,14 @@ export default function ModalIncomingCall({
     selectedContractorsIds: selectedContractorsIds,
   });
 
+  useEffect(() => {
+    if (selectedContractorsIds.length === 0) {
+      setSelectedInsuredIds([]);
+      setSelectedRequestsIds([]);
+      setSelectedTasksIds([]);
+    }
+  }, [selectedContractorsIds]);
+
   return (
     <div className="incoming-call-modal">
       <div className="incoming-call-modal__header">

@@ -49,14 +49,32 @@ export default function ContractorList({
 
   //Количество обратившихся
   const [contractorCount, setContractorCount] = useState<number>(0);
+  const [isLoadingCount, setIsLoadingCount] = useState<boolean>(true);
+  // const fetchElementsCount = async () => {
+  //   const count = await Scripts.getCountConractor(contractorsSearchData);
+  //   setContractorCount(count);
+  // };
+  // // Вычислить количество обратившихся
+  // useEffect(() => {
+  //   fetchElementsCount();
+  // }, []);
   const fetchElementsCount = async () => {
-    const count = await Scripts.getCountConractor(contractorsSearchData);
-    setContractorCount(count);
+    setIsLoadingCount(true);
+    try {
+      const count = await Scripts.getCountConractor(contractorsSearchData);
+      setContractorCount(count);
+    } finally {
+      setIsLoadingCount(false);
+    }
   };
   // Вычислить количество обратившихся
   useEffect(() => {
     fetchElementsCount();
-  }, []);
+  }, [contractorsSearchData]);
+  // Отображение количества
+  function getCountString(count: number) {
+    return isLoadingCount ? "--" : `${count}`;
+  }
 
   // Значение с debounce
   const searchQueryDebounced = useDebounce(searchQuery, 500);
@@ -186,7 +204,7 @@ export default function ContractorList({
     <>
       <Panel
         label={"Совпадения по номеру"}
-        count={contractorCount}
+        count={getCountString(contractorCount)}
         isOpen={false}
       >
         <div className="insured-list">
