@@ -50,6 +50,8 @@ export default function ContractorList({
   //Количество обратившихся
   const [contractorCount, setContractorCount] = useState<number>(0);
   const [isLoadingCount, setIsLoadingCount] = useState<boolean>(true);
+
+  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(false);
   // const fetchElementsCount = async () => {
   //   const count = await Scripts.getCountConractor(contractorsSearchData);
   //   setContractorCount(count);
@@ -63,6 +65,12 @@ export default function ContractorList({
     try {
       const count = await Scripts.getCountConractor(contractorsSearchData);
       setContractorCount(count);
+
+      if (count > 1) {
+        setIsPanelOpen(true);
+      } else {
+        setIsPanelOpen(false);
+      }
     } finally {
       setIsLoadingCount(false);
     }
@@ -130,13 +138,13 @@ export default function ContractorList({
       isSortable: true,
     }),
     new ListColumnData({
-      name: "Полис",
-      code: "policy",
+      name: "Телефон",
+      code: "phone",
       fr: 1,
     }),
     new ListColumnData({
-      name: "Телефон",
-      code: "phone",
+      name: "Полис",
+      code: "policy",
       fr: 1,
     }),
     new ListColumnData({
@@ -205,7 +213,7 @@ export default function ContractorList({
       <Panel
         label={"Совпадения по номеру"}
         count={getCountString(contractorCount)}
-        isOpen={false}
+        isOpen={isPanelOpen}
       >
         <div className="insured-list">
           <div className="insured-list__search">

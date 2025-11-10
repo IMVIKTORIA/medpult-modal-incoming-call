@@ -51,7 +51,7 @@ function CustomListRowColumn(props: ListColumnProps) {
   const statusRequestColor =
     code === "statusRequest" ? getStatusRequestColor(data?.info) : undefined;
 
-  const statusTaskIcon =
+  const statusTaskColor =
     code === "statusTask" ? getStatusTaskIcon(data?.info) : undefined;
 
   const openButton =
@@ -88,17 +88,22 @@ function CustomListRowColumn(props: ListColumnProps) {
           // color: statusContragentColor,
           ...(code === "statusRequest" && {
             backgroundColor: statusRequestColor,
-            padding: "3px 16px",
+            padding: "3px 8px",
             borderRadius: "12px",
+            color: "#303337",
+          }),
+          ...(code === "statusTask" && {
+            backgroundColor: statusTaskColor,
+            padding: "3px 8px",
+            borderRadius: "4px",
+            color: "#FDFDFD",
           }),
         }}
       >
         {/* Отображение кастомной колонки */}
         {props.getCustomColumComponent && props.getCustomColumComponent(data)}
         {/* Отображение кастомной иконки по старой логике */}
-        {(isIcon && statusTaskIcon) ||
-          (isIcon && integrationIcon) ||
-          (isIcon && openButton)}
+        {(isIcon && integrationIcon) || (isIcon && openButton)}
         {/* Отображение стандартной колонки */}
         {!props.getCustomColumComponent && (
           <span

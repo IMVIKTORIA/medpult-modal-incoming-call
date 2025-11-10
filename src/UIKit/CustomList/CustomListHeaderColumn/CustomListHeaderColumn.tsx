@@ -25,6 +25,8 @@ function CustomListHeaderColumn(props: ListColumnProps) {
   //   }
   //   handleSortClick(data);
   // };
+  const isActive = sortData?.code === code;
+  const isAscending = sortData?.isAscending;
 
   const toggleSortColumn = () => {
     let data: SortData | undefined = sortData;
@@ -41,7 +43,9 @@ function CustomListHeaderColumn(props: ListColumnProps) {
 
   const sortButton = (
     <div
-      className="custom-list-header-column__button"
+      className={`custom-list-header-column__button ${
+        isActive ? (isAscending ? "asc" : "desc") : ""
+      }`}
       onClick={toggleSortColumn}
     >
       {icons.SortArrow}

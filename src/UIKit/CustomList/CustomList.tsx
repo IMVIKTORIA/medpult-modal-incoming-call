@@ -35,6 +35,7 @@ type ListProps<SearchDataType = any, ItemType = any> = {
   searchFields?: string[];
   /** Установка обработчика нажатия на поиск */
   setSearchHandler?: (callback: () => void) => void;
+  onDataLoaded?: () => void;
 
   /** Получение формы детальной информации по вкладке */
   getDetailsLayout?: ({
@@ -71,6 +72,7 @@ function CustomList<SearchDataType = any, ItemType = any>(
     isSelectable,
     selectedItems = [],
     setSelectedItems,
+    onDataLoaded,
   } = props;
 
   // Страница
@@ -134,6 +136,7 @@ function CustomList<SearchDataType = any, ItemType = any>(
     setItems([...items, ...fetchData.items]);
     setPage(page + 1);
     setIsLoading(false);
+    if (onDataLoaded) onDataLoaded();
   };
 
   useEffect(() => {

@@ -34,6 +34,8 @@ export type RequestListProps = {
   selectedContractorsIds: string[];
   /** Иденификаторы выбранных задач */
   selectedTasksIds: string[];
+  /** Обновляем кол-во обращений при создании нового обращения */
+  onDataLoaded?: () => void;
 };
 
 /** Данные поиска обращений */
@@ -66,6 +68,7 @@ export default function RequestList({
   setSliderActive,
   selectedContractorsIds,
   selectedTasksIds,
+  onDataLoaded,
 }: RequestListProps) {
   // Поисковый запрос
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -358,6 +361,7 @@ export default function RequestList({
             isMultipleSelect={false}
             setSelectedItems={(ids: string[]) => setSelectedRequestsIds(ids)}
             selectedItems={selectedRequestsIds}
+            onDataLoaded={onDataLoaded}
           />
         </div>
       </div>

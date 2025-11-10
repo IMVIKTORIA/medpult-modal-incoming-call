@@ -102,36 +102,35 @@ export function saveState<ValueType>(state: ValueType) {
 export function getStatusRequestColor(status: any) {
   switch (status) {
     case "sozdano":
-      return "#E7F5B6";
+      return "#CADEFA";
     case "vrabote":
-      return "#C5CBE9";
+      return "#F8E0C4";
     case "utochnenie-zaprosa":
-      return "#B3EAD0";
+      return "#EBE9FE";
     case "v-ozhidanii":
-      return "#D1D8DC";
+      return "#E9EAEB";
     case "zakryto":
-      return "#BCE0FB";
+      return "#CBEAD1";
     case "otkryto":
-      return "#BCE0FB";
+      return "#F7D1CE";
     default:
-      "#2d2e2f";
   }
 }
 
 export function getStatusTaskIcon(status: any) {
   switch (status) {
     case "queue":
-      return icons.StatusQueue;
+      return "#1570EF";
     case "atWork":
-      return icons.StatusAtWork;
+      return "#DC7703";
     case "control":
-      return icons.StatusControl;
+      return "#7A5AF8";
     case "postpone":
-      return icons.StatusPostpone;
+      return "#717680";
     case "complete":
-      return icons.StatusComplete;
+      return "#21A038";
     case "returned":
-      return icons.StatusComplete;
+      return "#D92D20";
     default:
       return;
   }

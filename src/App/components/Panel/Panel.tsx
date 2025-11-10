@@ -19,6 +19,9 @@ export default function Panel({
   isOpen = true,
 }: PanelProps) {
   const [isPanelOpen, setIsPanelOpen] = useState<boolean>(isOpen);
+  useEffect(() => {
+    setIsPanelOpen(isOpen);
+  }, [isOpen]);
 
   const handleClick = () => {
     if (!isRollable) return;

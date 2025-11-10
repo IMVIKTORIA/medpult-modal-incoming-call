@@ -130,7 +130,10 @@ export default function SearchContractor({
                 className="search-contractor__field__button"
                 onClick={() => searchContractor()}
               >
-                {icons.Change} <span>Заменить</span>
+                {icons.Change}{" "}
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                  Назначить номер другому контрагенту
+                </span>
               </span>
             </div>
           </div>
