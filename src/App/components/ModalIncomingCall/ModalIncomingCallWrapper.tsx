@@ -12,15 +12,17 @@ export default function ModalIncomingCallWrapper() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    Scripts.OnInit().then(() => {
+    const onInitHandler = async() => {
+      await Scripts.OnInit();
+
       const currentURL = new URL(window.location.href);
       const phone = currentURL.searchParams.get("phone") || undefined;
       const insuredId = currentURL.searchParams.get("insuredId") || undefined;
-      const policyId = currentURL.searchParams.get("policyId") || undefined;
-
+      
       const globalContractorId =
-        currentURL.searchParams.get("contractorId") || undefined;
-
+      currentURL.searchParams.get("contractorId") || undefined;
+      const policyId = currentURL.searchParams.get("policyId") || await Scripts.getContractorPolicyId(globalContractorId) || undefined;
+      
       const data: ContractorsSearchData = {};
       if (phone) data.phone = phone;
       if (insuredId) data.globalInsuredId = insuredId;
@@ -30,7 +32,9 @@ export default function ModalIncomingCallWrapper() {
 
       setContractorsSearchData(data);
       setIsLoading(false);
-    });
+    }
+
+    onInitHandler()
   }, []);
 
   return isLoading ? (
