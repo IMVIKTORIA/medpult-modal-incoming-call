@@ -191,7 +191,8 @@ export async function openNewRequest(
   const link = Scripts.getRequestPagePath();
   const redirectUrl = new URL(window.location.origin + "/" + link);
   if (requestId) redirectUrl.searchParams.set("request_id", requestId);
-  window.open(redirectUrl.toString(), "_blank");
+  //window.open(redirectUrl.toString(), "_blank");
+  redirectSPAWithURL(redirectUrl);
 }
 
 //Отркыть форму создания задачи
@@ -215,7 +216,8 @@ export async function openNewTask(
   const redirectUrl = new URL(window.location.origin + "/" + link);
   if (requestId) redirectUrl.searchParams.set("request_id", requestId);
   redirectUrl.searchParams.set("create-task", "new");
-  window.open(redirectUrl.toString(), "_blank");
+  //window.open(redirectUrl.toString(), "_blank");
+  redirectSPAWithURL(redirectUrl);
 
   return true;
 }

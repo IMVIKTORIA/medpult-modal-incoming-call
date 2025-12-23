@@ -124,8 +124,8 @@ export default function TaskList({
     const redirectUrl = new URL(window.location.origin + "/" + link);
     if (requestId) redirectUrl.searchParams.set("request_id", requestId);
     if (taskId) redirectUrl.searchParams.set("task_id", taskId);
-    //utils.redirectSPA(redirectUrl.toString());
-    window.open(redirectUrl.toString(), "_blank");
+    utils.redirectSPA(redirectUrl.toString());
+    //window.open(redirectUrl.toString(), "_blank");
   };
 
   /** Обработчик нажатия на кнопку "Привязать к задаче"  */
@@ -163,8 +163,8 @@ export default function TaskList({
     if (requestId) redirectUrl.searchParams.set("request_id", requestId);
     if (selectedTasksIds[0])
       redirectUrl.searchParams.set("task_id", selectedTasksIds[0]);
-    //utils.redirectSPA(redirectUrl.toString());
-    window.open(redirectUrl.toString(), "_blank");
+    utils.redirectSPA(redirectUrl.toString());
+    //window.open(redirectUrl.toString(), "_blank");
   };
 
   // Вспомогательная функция для показа ошибок

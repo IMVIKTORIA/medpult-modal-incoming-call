@@ -110,8 +110,8 @@ export default function RequestList({
     const link = Scripts.getRequestPagePath();
     const redirectUrl = new URL(window.location.origin + "/" + link);
     if (requestId) redirectUrl.searchParams.set("request_id", requestId);
-    // utils.redirectSPA(redirectUrl.toString());
-    window.open(redirectUrl.toString(), "_blank");
+    utils.redirectSPA(redirectUrl.toString());
+    //window.open(redirectUrl.toString(), "_blank");
   };
 
   // Вспомогательная функция для показа ошибок
@@ -182,8 +182,8 @@ export default function RequestList({
     const redirectUrl = new URL(window.location.origin + "/" + link);
     if (selectedRequestsIds[0])
       redirectUrl.searchParams.set("request_id", selectedRequestsIds[0]);
-    //utils.redirectSPA(redirectUrl.toString());
-    window.open(redirectUrl.toString(), "_blank");
+    utils.redirectSPA(redirectUrl.toString());
+    //window.open(redirectUrl.toString(), "_blank");
   };
   //Детальная информация обращений
   const getDetailsLayout = ({
