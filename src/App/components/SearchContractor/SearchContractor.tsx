@@ -27,6 +27,10 @@ export default function SearchContractor({
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    let cancelled = false;
+    const firstRender = isFirstRender.current;
+    isFirstRender.current = false;
+
     async function fetchContractors() {
       setLoading(true);
       //Если есть выбранный контаргент
@@ -36,15 +40,20 @@ export default function SearchContractor({
         );
         const contractor = await Scripts.getContractorById(
           contractorId,
-          isFirstRender.current,
+          firstRender,
           contractorsSearchData.phone,
           policyId
         );
-        if (contractor?.data) {
+        if (!cancelled && contractor?.data) {
           setContractors([contractor.data]);
           setLoading(false);
-          return;
         }
+        return;
+      }
+
+      if (contractorsSearchData.globalContractorId) {
+        setLoading(false);
+        return;
       }
       // Если нет id — обычная логика
       const result = await Scripts.getContractorList(
@@ -52,30 +61,17 @@ export default function SearchContractor({
         undefined,
         contractorsSearchData
       );
-      const items = result.items.map((i) => i.data);
-      setContractors(items);
-      setLoading(false);
+      if (!cancelled) {
+        setContractors(result.items.map((i) => i.data));
+        setLoading(false);
+      }
     }
 
     fetchContractors();
-    isFirstRender.current = false;
-  }, [contractorsSearchData, selectedContractorsIds]);
-
-  // useEffect(() => {
-  //   async function fetchContractors() {
-  //     setLoading(true);
-  //     const result = await Scripts.getContractorList(
-  //       0,
-  //       undefined,
-  //       contractorsSearchData
-  //     );
-  //     const items = result.items.map((i) => i.data);
-
-  //     setContractors(items);
-  //     setLoading(false);
-  //   }
-  //   fetchContractors();
-  // }, [contractorsSearchData]);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedContractorsIds, contractorsSearchData]);
 
   /** Обработчик нажатия на контрагента*/
   const onClickContractor = async (contractor: ContractorListData) => {
